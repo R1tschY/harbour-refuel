@@ -19,7 +19,7 @@ public:
             Request::Fuel spirit, Request::Sorting sorting);
 
 signals:
-    void listReceived(const QVector<Station>& stations);
+    void listReceived(const QVector<StationWithPrice>& stations);
     void errorOccured(const QString& error);
 
 private:

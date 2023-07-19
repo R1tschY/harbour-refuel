@@ -74,7 +74,7 @@ void StationListModel::search(
                    Request::Sorting::Distance);
 }
 
-void StationListModel::onSearchResults(const QVector<Station>& stations)
+void StationListModel::onSearchResults(const QVector<StationWithPrice>& stations)
 {
     beginResetModel();
     m_stations = stations;

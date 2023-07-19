@@ -100,7 +100,7 @@ void TankerKoenigApiRequest::list(
         const auto stations = root.value(QStringLiteral("stations")).toArray();
         qCInfo(logger) << "Got list result with" << stations.size() << "items";
 
-        QVector<Station> result;
+        QVector<StationWithPrice> result;
         for (auto station : stations) {
             auto stationObject = station.toObject();
             auto id = stationObject.value(QStringLiteral("id")).toString();
@@ -133,16 +133,17 @@ void TankerKoenigApiRequest::list(
                 price = stationObject.value(QStringLiteral("price")).toDouble();
             }
 
-            result.append(Station {
-                .id = id,
-                .name = name,
-                .brand = brand,
-                .address = address,
-                .latitude = lat,
-                .longitude = lng,
-                .distance = dist,
-                .isOpen = isOpen,
-                .price = price });
+            result.append(StationWithPrice {
+                              .id = id,
+                              .name = name,
+                              .brand = brand,
+                              .address = address,
+                              .latitude = lat,
+                              .longitude = lng,
+                              .distance = dist,
+                              .isOpen = isOpen,
+                              .price = price
+                          });
         }
 
         emit listReceived(result);

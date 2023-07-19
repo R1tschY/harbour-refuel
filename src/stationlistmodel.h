@@ -35,10 +35,10 @@ public:
             float lat, float lng, float radius, int fuel);
 
 private:
-    QVector<Station> m_stations;
+    QVector<StationWithPrice> m_stations;
     TankerKoenigApiRequest m_request;
 
-    void onSearchResults(const QVector<Station>& stations);
+    void onSearchResults(const QVector<StationWithPrice>& stations);
 };
 
 #endif // STATIONLISTMODEL_H

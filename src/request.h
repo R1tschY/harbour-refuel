@@ -3,7 +3,7 @@
 
 #include <QObject>
 
-struct Station {
+struct StationWithPrice {
     QString id;
     QString name;
     QString brand;
