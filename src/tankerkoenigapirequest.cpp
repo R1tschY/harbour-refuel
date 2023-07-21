@@ -7,54 +7,69 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QStringBuilder>
-#include <QUrl>
-#include <QUrlQuery>
+#include <QGeoCoordinate>
+
+#include "qtployfill.h"
 
 static Q_LOGGING_CATEGORY(logger, "refuel.tankerkoenig");
 
 static const QUrl LIST_URL = QUrl(QStringLiteral("https://creativecommons.tankerkoenig.de/json/list.php"));
 
-TankerKoenigApiRequest::TankerKoenigApiRequest(QObject* parent)
-    : Request(parent)
+
+TankerKoenigProvider::TankerKoenigProvider(QObject *parent)
+    : FuelPriceProvider(parent)
     , m_network()
     , m_apiKey(QStringLiteral("00000000-0000-0000-0000-000000000002"))
-    , m_reply(nullptr)
 {
 }
 
-void TankerKoenigApiRequest::list(
-    double latitude, double longitude, double radius, Fuel spirit,
-    Sorting sorting)
+QGeoRectangle TankerKoenigProvider::boundingBox() const
 {
-    QUrlQuery query {};
+    // Data © OpenStreetMap contributors, ODbL 1.0. https://osm.org/copyright
+    // > curl "https://nominatim.openstreetmap.org/search?q=germany&format=json&limit=1"
+    //   | jq '.[0].boundingbox'
+    return QGeoRectangle(
+                QGeoCoordinate(5.8663153, 47.2701114),
+                QGeoCoordinate(15.0419309, 55.099161));
+}
+
+void TankerKoenigProvider::setUserAgent(const QString &value)
+{
+    if (m_userAgent != value) {
+        m_userAgent = value;
+        emit userAgentChanged();
+    }
+}
+
+FuelPriceReply *TankerKoenigProvider::list(const QGeoCoordinate &coordinate, double radius, Fuel fuel,
+        Sorting sorting)
+{
+    QUrlQuery query;
     query.addQueryItem(QStringLiteral("apikey"), m_apiKey);
-    query.addQueryItem(QStringLiteral("lat"), QString::number(latitude));
-    query.addQueryItem(QStringLiteral("lng"), QString::number(longitude));
+    query.addQueryItem(QStringLiteral("lat"), QString::number(coordinate.latitude()));
+    query.addQueryItem(QStringLiteral("lng"), QString::number(coordinate.longitude()));
     query.addQueryItem(QStringLiteral("rad"), QString::number(radius));
 
-    QString spiritStr;
-    switch (spirit) {
-    case Request::Fuel::SuperE5:
-        spiritStr = QStringLiteral("e5");
+    QString fuelStr;
+    switch (fuel) {
+    case FuelPriceProvider::Fuel::SuperE5:
+        fuelStr = QStringLiteral("e5");
         break;
-    case Request::Fuel::SuperE10:
-        spiritStr = QStringLiteral("e10");
+    case FuelPriceProvider::Fuel::SuperE10:
+        fuelStr = QStringLiteral("e10");
         break;
-    case Request::Fuel::Diesel:
-        spiritStr = QStringLiteral("diesel");
-        break;
-    case Request::Fuel::All:
-        spiritStr = QStringLiteral("all");
+    case FuelPriceProvider::Fuel::Diesel:
+        fuelStr = QStringLiteral("diesel");
         break;
     }
-    query.addQueryItem(QStringLiteral("type"), spiritStr);
+    query.addQueryItem(QStringLiteral("type"), fuelStr);
 
     QString sortingStr;
     switch (sorting) {
-    case Request::Sorting::Price:
+    case FuelPriceProvider::Sorting::Price:
         sortingStr = QStringLiteral("price");
         break;
-    case Request::Sorting::Distance:
+    case FuelPriceProvider::Sorting::Distance:
         sortingStr = QStringLiteral("dist");
         break;
     }
@@ -64,88 +79,116 @@ void TankerKoenigApiRequest::list(
     url.setQuery(query);
 
     QNetworkRequest request { url };
-    request.setHeader(
-        QNetworkRequest::KnownHeaders::UserAgentHeader,
-        QStringLiteral("Refuel Sailfish OS/0.1.0"));
+    if (!m_userAgent.isEmpty()) {
+        request.setHeader(
+                    QNetworkRequest::KnownHeaders::UserAgentHeader,
+                    m_userAgent);
+    }
     request.setRawHeader("Accept", "application/json;charset=utf-8");
+    request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
 
     qCInfo(logger) << "Start list request";
     qCDebug(logger) << "Request URL" << url;
-    m_reply.reset(new HttpReply(m_network.get(request)));
-    connect(m_reply.data(), &HttpReply::success, this, [this, spirit]() {
-        HttpReply* reply = qobject_cast<HttpReply*>(sender());
+    auto* reply = m_network.get(request);
 
-        qCDebug(logger).noquote() << "Got content" << reply->getContent();
 
-        auto jsonDoc = reply->getJson();
-        if (jsonDoc.isEmpty()) {
-            emit errorOccured(QStringLiteral("Server error: invalid JSON"));
-            return;
-        }
+    return new TankerKoenigPriceReply(
+                coordinate, radius, fuel, sorting, reply);
+}
 
-        auto root = jsonDoc.object();
-        bool ok = root.value(QStringLiteral("ok")).toBool(false);
-        if (!ok) {
-            auto message = root.value("message").toString("<missing>");
-            emit errorOccured(QStringLiteral("Server error: ") % message);
-            return;
-        }
+TankerKoenigPriceReply::TankerKoenigPriceReply(
+        const QGeoCoordinate& coordinate, double radius,
+        FuelPriceProvider::Fuel fuel, FuelPriceProvider::Sorting sorting,
+        QNetworkReply *reply)
+    : FuelPriceReply(coordinate, radius, fuel, sorting)
+{
+    reply->setReadBufferSize(0);
 
-        QString status = root.value(QStringLiteral("status")).toString();
-        if (status != QStringLiteral("ok")) {
-            emit errorOccured(QStringLiteral("Status error: ") % status);
-            return;
-        }
+    connect(reply, &QNetworkReply::finished,
+            this, &TankerKoenigPriceReply::onNetworkReplyFinished);
+    connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
+            this, &TankerKoenigPriceReply::onNetworkReplyError);
+    connect(this, &QObject::destroyed, reply, &QObject::deleteLater);
+    connect(this, &FuelPriceReply::aborted, reply, &QNetworkReply::abort);
+}
 
-        const auto stations = root.value(QStringLiteral("stations")).toArray();
-        qCInfo(logger) << "Got list result with" << stations.size() << "items";
+void TankerKoenigPriceReply::onNetworkReplyFinished()
+{
+    QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
+    reply->deleteLater();
 
-        QVector<StationWithPrice> result;
-        for (auto station : stations) {
-            auto stationObject = station.toObject();
-            auto id = stationObject.value(QStringLiteral("id")).toString();
-            auto name = stationObject.value(QStringLiteral("name")).toString();
-            auto brand = stationObject.value(QStringLiteral("brand")).toString();
-            auto street = stationObject.value(QStringLiteral("street")).toString();
-            auto houseNumber = stationObject.value(QStringLiteral("houseNumber")).toString();
-            auto postCode = stationObject.value(QStringLiteral("postCode")).toInt();
-            auto place = stationObject.value(QStringLiteral("place")).toString();
-            float lat = stationObject.value(QStringLiteral("lat")).toDouble();
-            float lng = stationObject.value(QStringLiteral("lng")).toDouble();
-            float dist = stationObject.value(QStringLiteral("dist")).toDouble();
-            auto isOpen = stationObject.value(QStringLiteral("isOpen")).toBool();
+    if (reply->error() != QNetworkReply::NoError) {
+        return;
+    }
 
-            //            QString postCodeStr;
-            //            QTextStream postCodeStream(&postCodeStr, QIODevice::ReadOnly);
-            //            postCodeStream.setFieldWidth(5);
-            //            postCodeStream.setFieldAlignment(QTextStream::AlignRight);
-            //            postCodeStream.setPadChar('0');
-            // QStringLiteral("%1").arg(postCode, 5, '0')
+    QJsonParseError error;
+    auto jsonDoc = QJsonDocument::fromJson(reply->readAll(), &error);
+    if (error.error != QJsonParseError::NoError) {
+        setError(Error::ParseError, QStringLiteral("Server error: invalid JSON"));
+        return;
+    }
 
-            QString address = street % QChar(' ') % houseNumber % QStringLiteral(", ")
-                % QString::number(postCode).rightJustified(5, '0')
-                % QChar(' ') % place;
+    auto root = jsonDoc.object();
+    bool ok = root.value(QStringLiteral("ok")).toBool(false);
+    if (!ok) {
+        auto message = root.value("message").toString("<missing>");
+        setError(Error::UnknownError, QStringLiteral("Server error: ") % message);
+        return;
+    }
 
-            float price;
-            if (spirit == Request::Fuel::All) {
-                price = stationObject.value(QStringLiteral("e10")).toDouble();
-            } else {
-                price = stationObject.value(QStringLiteral("price")).toDouble();
-            }
+    QString status = root.value(QStringLiteral("status")).toString();
+    if (status != QStringLiteral("ok")) {
+        setError(Error::UnknownError, QStringLiteral("Status error: ") % status);
+        return;
+    }
 
-            result.append(StationWithPrice {
-                              .id = id,
-                              .name = name,
-                              .brand = brand,
-                              .address = address,
-                              .latitude = lat,
-                              .longitude = lng,
-                              .distance = dist,
-                              .isOpen = isOpen,
-                              .price = price
-                          });
-        }
+    const auto stations = root.value(QStringLiteral("stations")).toArray();
+    qCInfo(logger) << "Got list result with" << stations.size() << "items";
 
-        emit listReceived(result);
-    });
+    for (auto station : stations) {
+        auto stationObject = station.toObject();
+        auto id = stationObject.value(QStringLiteral("id")).toString();
+        auto name = stationObject.value(QStringLiteral("name")).toString();
+        auto brand = stationObject.value(QStringLiteral("brand")).toString();
+        auto street = stationObject.value(QStringLiteral("street")).toString();
+        auto houseNumber = stationObject.value(QStringLiteral("houseNumber")).toString();
+        auto postCode = stationObject.value(QStringLiteral("postCode")).toInt();
+        auto place = stationObject.value(QStringLiteral("place")).toString();
+        float lat = stationObject.value(QStringLiteral("lat")).toDouble();
+        float lng = stationObject.value(QStringLiteral("lng")).toDouble();
+        float dist = stationObject.value(QStringLiteral("dist")).toDouble();
+        auto isOpen = stationObject.value(QStringLiteral("isOpen")).toBool();
+        float price = stationObject.value(QStringLiteral("price")).toDouble();
+
+        QGeoAddress address;
+        address.setCity(place);
+        address.setCountryCode(QStringLiteral("de"));
+        address.setPostalCode(QString::number(postCode).rightJustified(5, '0'));
+        address.setStreet(street % QChar(' ') % houseNumber);
+        address.setText(street % QChar(' ') % houseNumber % QStringLiteral(", ")
+                        % address.postalCode()
+                        % QChar(' ') % place);
+
+
+        addStation(StationWithPrice {
+                          .id = id,
+                          .name = name,
+                          .brand = brand,
+                          .address = address,
+                          .coordinate = QGeoCoordinate(lat, lng),
+                          .distance = dist,
+                          .isOpen = isOpen,
+                          .price = price
+                      });
+    }
+
+    setFinished();
+}
+
+void TankerKoenigPriceReply::onNetworkReplyError()
+{
+    QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
+    reply->deleteLater();
+
+    setError(Error::CommunicationError, reply->errorString());
 }

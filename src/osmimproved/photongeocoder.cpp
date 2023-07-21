@@ -22,31 +22,28 @@ static QString bboxFromShape(const QGeoRectangle& bounds) {
 
 PhotonGeoCodingManagerEngine::PhotonGeoCodingManagerEngine(const QVariantMap &parameters, QGeoServiceProvider::Error *error, QString *errorString)
     : QGeoCodingManagerEngine(parameters)
-    , m_baseUrl(parameters.value(QStringLiteral("url"), PHOTON_URL).toString())
-    , m_userAgent(parameters.value(QStringLiteral("useragent"), "Refuel").toString().toLatin1())
+    , m_baseUrl(parameters.value(QStringLiteral("osmimproved.photon.url"), PHOTON_URL).toString())
+    , m_userAgent(parameters.value(QStringLiteral("osmimproved.useragent")).toString().toLatin1())
 {
     if (m_userAgent.isEmpty()) {
         *error = QGeoServiceProvider::MissingRequiredParameterError;
-        *errorString = QStringLiteral("useragent parameter is required");
-        // TODO: return;
+        *errorString = QStringLiteral("'osmimproved.useragent' parameter is required");
+        return;
     }
 
     *error = QGeoServiceProvider::NoError;
     errorString->clear();
 }
 
+PhotonGeoCodingManagerEngine::~PhotonGeoCodingManagerEngine() = default;
+
 PhotonGeoCodeReply *PhotonGeoCodingManagerEngine::geocode(const QGeoAddress &address, const QGeoShape &bounds)
 {
     return geocode(address.text(), -1, -1, bounds);
 }
 
-
 PhotonGeoCodeReply *PhotonGeoCodingManagerEngine::geocode(const QString &address, int limit, int offset, const QGeoShape &bounds)
 {
-    QNetworkRequest request;
-    request.setRawHeader("user-agent", m_userAgent);
-
-    QUrl url { QStringLiteral("https://photon.komoot.io/api/") };
     QUrlQuery query;
     query.addQueryItem(QStringLiteral("q"), address);
     if (locale() != QLocale::c()) {
@@ -58,12 +55,16 @@ PhotonGeoCodeReply *PhotonGeoCodingManagerEngine::geocode(const QString &address
     if (bounds.type() == QGeoShape::RectangleType) {
         query.addQueryItem(QStringLiteral("bbox"), bboxFromShape(bounds));
     }
+
+    QUrl url { m_baseUrl };
     url.setQuery(query);
+
+    QNetworkRequest request;
     request.setUrl(url);
+    request.setRawHeader("user-agent", m_userAgent);
+    request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
 
     auto* reply = m_networkManager.get(request);
-    reply->setReadBufferSize(0);
-
     PhotonGeoCodeReply* geocodeReply =
             new PhotonGeoCodeReply(reply, limit, this);
 
@@ -73,7 +74,6 @@ PhotonGeoCodeReply *PhotonGeoCodingManagerEngine::geocode(const QString &address
             this, [this](QGeoCodeReply::Error errorCode, const QString& errorString) {
         emit error(static_cast<QGeoCodeReply*>(sender()), errorCode, errorString);
     });
-
     return geocodeReply;
 }
 
@@ -83,32 +83,47 @@ QGeoCodeReply *PhotonGeoCodingManagerEngine::reverseGeocode(const QGeoCoordinate
 }
 
 PhotonGeoCodeReply::PhotonGeoCodeReply(QNetworkReply *reply, int limit, QObject *parent)
-:   QGeoCodeReply(parent)
+    : QGeoCodeReply(parent)
+    , m_reply(reply)
 {
     Q_ASSERT(reply != nullptr);
+
+    reply->setReadBufferSize(0);
+
     setLimit(limit);
     setOffset(0);
-    connect(
-                reply, &QNetworkReply::finished,
-                this, &PhotonGeoCodeReply::onNetworkReplyFinished);
-    connect(
-                reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
-                this, &PhotonGeoCodeReply::onNetworkReplyError);
-    connect(this, &QGeoCodeReply::abort, reply, &QNetworkReply::abort);
-    connect(this, &QObject::destroyed, reply, &QObject::deleteLater);
+    connect(reply, &QNetworkReply::finished,
+            this, &PhotonGeoCodeReply::onNetworkReplyFinished);
+    connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
+            this, &PhotonGeoCodeReply::onNetworkReplyError);
+}
+
+PhotonGeoCodeReply::~PhotonGeoCodeReply()
+{
+    if (m_reply) {
+        delete m_reply;
+    }
 }
 
 void PhotonGeoCodeReply::onNetworkReplyFinished()
 {
     QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
     reply->deleteLater();
+    m_reply = nullptr;
 
     if (reply->error() != QNetworkReply::NoError) {
         return;
     }
 
     QList<QGeoLocation> result;
-    const QJsonDocument document = QJsonDocument::fromJson(reply->readAll());
+    QJsonParseError jsonError;
+    const QJsonDocument document = QJsonDocument::fromJson(reply->readAll(), &jsonError);
+    if (jsonError.error != QJsonParseError::NoError) {
+        setError(QGeoCodeReply::ParseError,
+                 QStringLiteral("Invalid JSON reply: ") % jsonError.errorString());
+        return;
+    }
+
     const QJsonObject featureCollection = document.object();
     const QJsonArray features = featureCollection.value(QStringLiteral("features")).toArray();
     for (auto feature : features) {
@@ -149,7 +164,14 @@ void PhotonGeoCodeReply::onNetworkReplyError(QNetworkReply::NetworkError error)
 {
     QNetworkReply *reply = static_cast<QNetworkReply *>(sender());
     reply->deleteLater();
+    m_reply = nullptr;
 
     setError(QGeoCodeReply::CommunicationError, reply->errorString());
 }
 
+void PhotonGeoCodeReply::abort()
+{
+    if (m_reply) {
+        m_reply->abort();
+    }
+}

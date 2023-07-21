@@ -4,28 +4,49 @@
 #include <QObject>
 #include <QNetworkAccessManager>
 #include <QScopedPointer>
+#include <QGeoRectangle>
 
-#include "request.h"
-#include "httpreply.h"
+#include "fuelpriceprovider.h"
 
-class TankerKoenigApiRequest : public Request
+class TankerKoenigProvider : public FuelPriceProvider
 {
     Q_OBJECT
+    Q_PROPERTY(QString userAgent READ userAgent WRITE setUserAgent NOTIFY userAgentChanged)
 public:
-    explicit TankerKoenigApiRequest(QObject *parent = nullptr);
+    explicit TankerKoenigProvider(QObject *parent = nullptr);
 
-    void list(
-            double latitude, double longitude, double radius,
-            Request::Fuel spirit, Request::Sorting sorting);
+    QGeoRectangle boundingBox() const;
+
+    QString userAgent() const { return m_userAgent; }
+    void setUserAgent(const QString& value);
+
+    FuelPriceReply* list(
+            const QGeoCoordinate& coordinate, double radius,
+            FuelPriceProvider::Fuel spirit, FuelPriceProvider::Sorting sorting);
 
 signals:
-    void listReceived(const QVector<StationWithPrice>& stations);
-    void errorOccured(const QString& error);
+    void userAgentChanged();
 
 private:
     QNetworkAccessManager m_network;
     QString m_apiKey;
-    QScopedPointer<HttpReply> m_reply;
+    QString m_userAgent;
+};
+
+class TankerKoenigPriceReply : public FuelPriceReply
+{
+    Q_OBJECT
+public:
+    explicit TankerKoenigPriceReply(
+            const QGeoCoordinate& coordinate, double radius,
+            FuelPriceProvider::Fuel fuel, FuelPriceProvider::Sorting sorting,
+            QNetworkReply* reply);
+
+private:
+    QNetworkReply* m_reply;
+
+    void onNetworkReplyFinished();
+    void onNetworkReplyError();
 };
 
 #endif // TANKERKOENIGAPIREQUEST_H

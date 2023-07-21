@@ -7,10 +7,9 @@ import de.richardliebscher.refuel 0.1
 Page {
     id: page
 
-    property real latitude
-    property real longitude
+    property variant coordinate
     property real radius
-    property int fuelType
+    property int fuel
 
     allowedOrientations: Orientation.All
 
@@ -127,9 +126,22 @@ Page {
 
         }
 
+        ViewPlaceholder {
+            enabled: listModel.status === StationListModel.Error
+            text: listModel.errorString
+        }
+
+        ViewPlaceholder {
+            enabled: listView.count === 0 && listModel.status === StationListModel.Ready
+            text: qsTr("No station found")
+        }
+
+        BusyLabel {
+            running: listModel.status === StationListModel.Loading
+        }
+
         VerticalScrollDecorator { flickable: listView }
     }
 
-    Component.onCompleted:
-        listModel.search(latitude, longitude, radius, fuelType)
+    Component.onCompleted: listModel.search(coordinate, radius, fuel)
 }

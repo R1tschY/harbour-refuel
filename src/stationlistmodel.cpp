@@ -2,10 +2,25 @@
 
 StationListModel::StationListModel(QObject *parent)
     : QAbstractListModel(parent)
+{ }
+
+void StationListModel::setError(const QString &errorString)
 {
-    connect(
-                &m_request, &TankerKoenigApiRequest::listReceived,
-                this, &StationListModel::onSearchResults);
+    if (m_errorString != errorString) {
+        m_errorString = errorString;
+        emit errorStringChanged();
+        if (!m_errorString.isEmpty()) {
+            setStatus(Status::Error);
+        }
+    }
+}
+
+void StationListModel::setStatus(Status status)
+{
+    if (m_status != status) {
+        m_status = status;
+        emit statusChanged();
+    }
 }
 
 int StationListModel::rowCount(const QModelIndex &parent) const
@@ -35,11 +50,9 @@ QVariant StationListModel::data(const QModelIndex &index, int role) const
     case BrandRole:
         return station.brand;
     case AddressRole:
-        return station.address;
-    case LatituteRole:
-        return station.latitude;
-    case LongitudeRole:
-        return station.longitude;
+        return station.address.text();
+    case CoordinateRole:
+        return QVariant::fromValue(station.coordinate);
     case DistanceRole:
         return station.distance;
     case IsOpenRole:
@@ -51,7 +64,6 @@ QVariant StationListModel::data(const QModelIndex &index, int role) const
     }
 }
 
-
 QHash<int, QByteArray> StationListModel::roleNames() const
 {
     QHash<int, QByteArray> roleNames;
@@ -59,8 +71,7 @@ QHash<int, QByteArray> StationListModel::roleNames() const
     roleNames.insert(NameRole, "name");
     roleNames.insert(BrandRole, "brand");
     roleNames.insert(AddressRole, "address");
-    roleNames.insert(LatituteRole, "latitute");
-    roleNames.insert(LongitudeRole, "longitude");
+    roleNames.insert(CoordinateRole, "coordinate");
     roleNames.insert(DistanceRole, "distance");
     roleNames.insert(IsOpenRole, "isOpen");
     roleNames.insert(PriceRole, "price");
@@ -68,15 +79,62 @@ QHash<int, QByteArray> StationListModel::roleNames() const
 }
 
 void StationListModel::search(
-        float lat, float lng, float radius, int fuel)
+        const QGeoCoordinate& coordinate, float radius, int fuel)
 {
-    m_request.list(lat, lng, radius, (Request::Fuel) fuel,
-                   Request::Sorting::Distance);
+    if (m_reply) {
+        m_reply->abort();
+        m_reply = nullptr;
+    }
+
+    beginResetModel();
+    m_stations = { };
+    endResetModel();
+
+    setStatus(Status::Loading);
+    setError({});
+
+    auto reply = m_provider.list(
+                coordinate, radius, (FuelPriceProvider::Fuel) fuel,
+                FuelPriceProvider::Sorting::Price);
+    connect(reply, &TankerKoenigPriceReply::finished,
+            this, &StationListModel::onSearchResults);
+    connect(reply, &TankerKoenigPriceReply::errorOccured,
+            this, &StationListModel::onSearchError);
+    connect(reply, &QObject::destroyed, this, [this]() { m_reply = nullptr; });
 }
 
-void StationListModel::onSearchResults(const QVector<StationWithPrice>& stations)
+void StationListModel::reset()
 {
     beginResetModel();
-    m_stations = stations;
+    m_stations = { };
     endResetModel();
+
+    setError({});
+    setStatus(Status::Null);
+}
+
+void StationListModel::onSearchResults()
+{
+    auto* reply = static_cast<TankerKoenigPriceReply*>(sender());
+    if (reply != m_reply) {
+        return;
+    }
+
+    beginResetModel();
+    m_stations = reply->stations();
+    endResetModel();
+
+    setStatus(Status::Ready);
+    m_reply = nullptr;
+}
+
+void StationListModel::onSearchError()
+{
+    auto* reply = static_cast<TankerKoenigPriceReply*>(sender());
+    if (reply != m_reply) {
+        return;
+    }
+
+    setError(reply->errorString());
+    m_reply = nullptr;
 }

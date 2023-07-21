@@ -1,11 +1,26 @@
 import QtQuick 2.0
+import QtLocation 5.3
 import Sailfish.Silica 1.0
 import "pages"
 
 ApplicationWindow {
-    initialPage: Component { ChooseLocationDialog { } }
+    initialPage: Component { HomePage { } }
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
     allowedOrientations: defaultAllowedOrientations
+
+    Plugin {
+        id: locationPlugin
+        name: "osmimproved"
+
+        PluginParameter {
+            name: "osmimproved.useragent"
+            value: "Refuel Sailfish OS/0.1 Qt/5.6.3" // TODO: replace versions
+        }
+        PluginParameter {
+            name: "osmimproved.geocoder"
+            value: "photon"
+        }
+    }
 
     function formatPrice(price) {
         var str = price.toFixed(3)

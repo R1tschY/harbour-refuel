@@ -5,17 +5,13 @@ import Sailfish.Silica 1.0
 import de.richardliebscher.refuel 0.1
 
 Page {
+    id: page
+
     allowedOrientations: Orientation.All
 
-    Plugin {
-        id: geocodingPlugin
-        name: "osmimproved"
+    property var location
 
-        PluginParameter {
-            name: "useragent";
-            value: "Refuel Sailfish OS/0.1 QtLocation/" + qVersion
-        }
-    }
+    signal selected(var location)
 
     SilicaListView {
         id: listView
@@ -33,28 +29,39 @@ Page {
                 id: searchField
 
                 inputMethodHints: Qt.ImhNoPredictiveText
-                placeholderText: qsTr("Address")
+                placeholderText: qsTr("Search address")
+                focus: true
 
                 EnterKey.enabled: text.length > 0
                 EnterKey.iconSource: "image://theme/icon-m-search"
-                EnterKey.onClicked: {
-                    geocodeModel.query = searchField.text
-                    geocodeModel.update()
-                }
+                EnterKey.onClicked: geocodeModel.search(searchField.text)
+
+                onTextChanged: geocodeModel.search(searchField.text)
             }
         }
 
         model: GeocodeModel {
             id: geocodeModel
-            plugin: geocodingPlugin
+            plugin: locationPlugin
             autoUpdate: false
-            limit: 15
+            limit: 10
+
+            function search(query) {
+                geocodeModel.query = query
+                if (query) {
+                    geocodeModel.update()
+                } else {
+                    geocodeModel.reset()
+                }
+            }
         }
 
         delegate: BackgroundItem {
             id: delegateItem
 
             onClicked: {
+                page.location = locationData
+                page.selected(locationData)
                 pageStack.pop()
             }
 
@@ -98,12 +105,12 @@ Page {
         ViewPlaceholder {
             enabled: listView.count === 0
                      && geocodeModel.status === GeocodeModel.Ready
-            text: qsTr("Nothing found") + geocodeModel.error
+            text: qsTr("Nothing found")
         }
 
         ViewPlaceholder {
             enabled: geocodeModel.status === GeocodeModel.Null
-            text: qsTr("Start search")
+            text: qsTr("Type to start search")
         }
 
         BusyLabel {

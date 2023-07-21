@@ -6,7 +6,7 @@
 
 #include <sailfishapp.h>
 #include "stationlistmodel.h"
-#include "request.h"
+#include "fuelpriceprovider.h"
 #include "osmimproved/osmimprovedplugin.h"
 
 Q_IMPORT_PLUGIN(OsmImprovedPlugin)
@@ -15,8 +15,9 @@ int main(int argc, char *argv[])
 {
     qmlRegisterType<StationListModel>(
                 "de.richardliebscher.refuel", 0, 1, "StationListModel");
-    qmlRegisterType<Request>(
-                "de.richardliebscher.refuel", 0, 1, "Request");
+    qmlRegisterUncreatableType<FuelPriceProvider>(
+                "de.richardliebscher.refuel", 0, 1, "FuelPriceProvider",
+                "abstract class");
 
     QScopedPointer<QGuiApplication> app { SailfishApp::application(argc, argv) };
     QScopedPointer<QQuickView> view { SailfishApp::createView() };

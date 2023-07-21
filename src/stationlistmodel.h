@@ -4,26 +4,38 @@
 #include <QAbstractListModel>
 
 #include "tankerkoenigapirequest.h"
-#include "request.h"
+#include "fuelpriceprovider.h"
 
 class StationListModel : public QAbstractListModel
 {
     Q_OBJECT
+    Q_PROPERTY(QString errorString READ errorString NOTIFY errorStringChanged)
+    Q_PROPERTY(Status status READ status NOTIFY statusChanged)
 
 public:
     explicit StationListModel(QObject *parent = nullptr);
+
+    enum Status {
+        Null,
+        Loading,
+        Error,
+        Ready
+    };
+    Q_ENUM(Status);
 
     enum Roles {
         IdRole = Qt::UserRole,
         NameRole,
         BrandRole,
         AddressRole,
-        LatituteRole,
-        LongitudeRole,
+        CoordinateRole,
         DistanceRole,
         IsOpenRole,
         PriceRole,
     };
+
+    Status status() const { return m_status; }
+    QString errorString() const { return m_errorString; }
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
@@ -32,13 +44,24 @@ public:
     QHash<int, QByteArray> roleNames() const override;
 
     Q_INVOKABLE void search(
-            float lat, float lng, float radius, int fuel);
+            const QGeoCoordinate& coordinate, float radius, int fuel);
+    Q_INVOKABLE void reset();
+
+signals:
+    void errorStringChanged();
+    void statusChanged();
 
 private:
     QVector<StationWithPrice> m_stations;
-    TankerKoenigApiRequest m_request;
+    TankerKoenigProvider m_provider;
+    QString m_errorString;
+    TankerKoenigPriceReply* m_reply;
+    Status m_status = Status::Null;
 
-    void onSearchResults(const QVector<StationWithPrice>& stations);
+    void onSearchResults();
+    void onSearchError();
+    void setError(const QString& errorString);
+    void setStatus(Status status);
 };
 
 #endif // STATIONLISTMODEL_H

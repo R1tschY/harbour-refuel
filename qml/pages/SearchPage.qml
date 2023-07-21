@@ -30,48 +30,22 @@ Dialog {
                 cancelText: qsTr("Cancel")
             }
 
-            Plugin {
-                    id: mapPlugin
-                    name: "osm" // "mapboxgl", "esri", ...
-                    // specify plugin parameters if necessary
-                    // PluginParameter {
-                    //     name:
-                    //     value:
-                    // }
-                }
-
-            Map {
-                id: map
-                plugin: mapPlugin
-                width: parent.width
-                height: Theme.paddingLarge * 20
-                zoomLevel: 14
-
-                center {
-                    latitude: -27.5796
-                    longitude: 153.1003
-                }
-
-                // Enable pinch gestures to zoom in and out
-                gesture.flickDeceleration: 3000
-                gesture.enabled: true
-
-            }
-
-
-
             ValueButton {
-                id: locationControl
+                id: locationChooser
 
-                property real lat: -1
-                property real lng: -1
-                property bool currentPos: true
+                width: parent.width
+
+                property variant coordinate: QtPositioning.coordinate()
+                property string address
+                property bool currentPos: false
 
                 label: qsTr("Near")
-                value: qsTr("Current Position")
+                value: currentPos
+                       ? qsTr("Current Position")
+                       : address
 
                 BusyIndicator {
-                    running: locationControl.lat === -1
+                    running: locationChooser.currentPos && coordinate.valid // TODO
                     size: BusyIndicatorSize.Small
                     anchors {
                         right: parent.right
@@ -80,7 +54,15 @@ Dialog {
                     }
                 }
 
-                onClicked: pageStack.push(locationChooserDialogComponent)
+                onClicked: {
+                    var dialog = pageStack.push(
+                               Qt.resolvedUrl("ChooseLocationDialog.qml"))
+                    dialog.selected.connect(function(location) {
+                        locationChooser.coordinate = location.coordinate
+                        locationChooser.address = location.address.text
+                        locationChooser.currentPos = false
+                    })
+                }
             }
 
             ComboBox {
@@ -94,20 +76,20 @@ Dialog {
                         model: [
                             {
                                 name: qsTr("Super E5"),
-                                ty: Request.SuperE5
+                                fuel: FuelPriceProvider.SuperE5
                             },
                             {
                                 name: qsTr("Super E10"),
-                                ty: Request.SuperE10
+                                fuel: FuelPriceProvider.SuperE10
                             },
                             {
                                 name: qsTr("Diesel"),
-                                ty: Request.Diesel
+                                fuel: FuelPriceProvider.Diesel
                             }
                         ]
 
                         MenuItem {
-                            readonly property int fuelType: modelData.ty
+                            readonly property int fuel: modelData.fuel
 
                             text: modelData.name
                         }
@@ -141,10 +123,10 @@ Dialog {
         }
     }
 
-    onAccepted: pageStack.push(
+    onAccepted:
+        pageStack.push(
                     Qt.resolvedUrl("StationListPage.qml"),
-                    { fuelType: fuelTypeChooser.currentItem.fuelType,
+                    { fuel: fuelTypeChooser.currentItem.fuel,
                         radius: radiusChooser.currentItem.radius,
-                        latitude: 52.521,
-                        longitude: 13.438 })
+                        coordinate: locationChooser.coordinate })
 }

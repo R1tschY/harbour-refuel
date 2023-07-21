@@ -11,14 +11,13 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_executable(harbour-tanken
     src/qtployfill.h
-    src/httpreply.h src/httpreply.cpp
 
     src/osmimproved/photongeocoder.h src/osmimproved/photongeocoder.cpp
     src/osmimproved/osmimprovedplugin.h src/osmimproved/osmimprovedplugin.cpp
 
     src/harbour-tanken.cpp
     src/tankerkoenigapirequest.h src/tankerkoenigapirequest.cpp
-    src/request.h src/request.cpp
+    src/fuelpriceprovider.h src/fuelpriceprovider.cpp
     src/stationlistmodel.h src/stationlistmodel.cpp
 )
 target_compile_definitions(harbour-tanken PRIVATE
