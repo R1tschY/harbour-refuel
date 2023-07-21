@@ -2,6 +2,8 @@
 #define REQUEST_H
 
 #include <QObject>
+#include <QList>
+#include <QHash>
 
 struct StationWithPrice {
     QString id;
@@ -14,6 +16,21 @@ struct StationWithPrice {
     bool isOpen;
     float price;
 };
+
+struct StationDetails {
+    QString id;
+    QString name;
+    QString brand;
+    QString address;
+    float latitude;
+    float longitude;
+    QList<QString> openingTimes;
+    QList<QString> openingTimesOverrides;
+    QHash<int, float> prices;
+    bool isOpen;
+    bool wholeDay;
+};
+
 
 class Request : public QObject
 {

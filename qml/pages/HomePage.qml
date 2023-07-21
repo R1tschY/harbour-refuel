@@ -1,7 +1,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
-import de.richardliebscher.tanken 0.1
+import de.richardliebscher.refuel 0.1
 
 
 Page {

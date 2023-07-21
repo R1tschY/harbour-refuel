@@ -12,8 +12,12 @@ BuildRequires:  pkgconfig(Qt5Core)
 BuildRequires:  pkgconfig(Qt5Qml)
 BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  pkgconfig(Qt5Positioning)
+BuildRequires:  pkgconfig(Qt5Location)
 BuildRequires:  desktop-file-utils
 BuildRequires:  cmake
+Requires: qt5-plugin-geoservices-osm
+Requires: qt5-qtdeclarative-import-location
+Requires: qt5-qtdeclarative-import-positioning
 
 %description
 Search for petrol stations prices in Germany

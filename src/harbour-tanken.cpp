@@ -2,27 +2,31 @@
 #include <QtQuick>
 #endif
 #include <QtQml>
+#include <QScopedPointer>
 
 #include <sailfishapp.h>
 #include "stationlistmodel.h"
 #include "request.h"
+#include "osmimproved/osmimprovedplugin.h"
+
+Q_IMPORT_PLUGIN(OsmImprovedPlugin)
 
 int main(int argc, char *argv[])
 {
-    // SailfishApp::main() will display "qml/harbour-tanken.qml", if you need more
-    // control over initialization, you can use:
-    //
-    //   - SailfishApp::application(int, char *[]) to get the QGuiApplication *
-    //   - SailfishApp::createView() to get a new QQuickView * instance
-    //   - SailfishApp::pathTo(QString) to get a QUrl to a resource file
-    //   - SailfishApp::pathToMainQml() to get a QUrl to the main QML file
-    //
-    // To display the view, call "show()" (will show fullscreen on device).
-
     qmlRegisterType<StationListModel>(
-                "de.richardliebscher.tanken", 0, 1, "StationListModel");
+                "de.richardliebscher.refuel", 0, 1, "StationListModel");
     qmlRegisterType<Request>(
-                "de.richardliebscher.tanken", 0, 1, "Request");
+                "de.richardliebscher.refuel", 0, 1, "Request");
 
-    return SailfishApp::main(argc, argv);
+    QScopedPointer<QGuiApplication> app { SailfishApp::application(argc, argv) };
+    QScopedPointer<QQuickView> view { SailfishApp::createView() };
+
+    QQmlEngine *engine = view->engine();
+    engine->rootContext()->setContextProperty(
+                QStringLiteral("qVersion"), QString(qVersion()));
+
+    view->setSource(SailfishApp::pathToMainQml());
+    view->showFullScreen();
+
+    return app->exec();
 }

@@ -1,0 +1,10 @@
+{
+    "Keys": ["osmimproved"],
+    "Provider": "osmimproved",
+    "Version": 100,
+    "Experimental": false,
+    "Features": [
+        "OnlineGeocodingFeature",
+        "ReverseGeocodingFeature"
+    ]
+}

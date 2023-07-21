@@ -1,7 +1,7 @@
 project(harbour-tanken CXX)
 cmake_minimum_required(VERSION 3.5)
 
-find_package (Qt5 COMPONENTS Core Network Qml Gui Quick REQUIRED)
+find_package (Qt5 COMPONENTS Core Network Qml Gui Quick Location REQUIRED)
 
 include(FindPkgConfig)
 pkg_search_module(SAILFISH sailfishapp REQUIRED)
@@ -10,20 +10,27 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 add_executable(harbour-tanken
+    src/qtployfill.h
+    src/httpreply.h src/httpreply.cpp
+
+    src/osmimproved/photongeocoder.h src/osmimproved/photongeocoder.cpp
+    src/osmimproved/osmimprovedplugin.h src/osmimproved/osmimprovedplugin.cpp
+
     src/harbour-tanken.cpp
     src/tankerkoenigapirequest.h src/tankerkoenigapirequest.cpp
     src/request.h src/request.cpp
     src/stationlistmodel.h src/stationlistmodel.cpp
-    src/httpreply.h src/httpreply.cpp)
+)
 target_compile_definitions(harbour-tanken PRIVATE
     $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>
+    QT_STATICPLUGIN
 )
 target_include_directories(harbour-tanken PRIVATE
     $<BUILD_INTERFACE:
     ${SAILFISH_INCLUDE_DIRS}
 >)
 target_link_libraries(harbour-tanken
-    Qt5::Quick
+    Qt5::Quick Qt5::Location
     ${SAILFISH_LDFLAGS}
 )
 
@@ -63,6 +70,7 @@ add_custom_target(distfiles
         qml/pages/StationListPage.qml
         qml/pages/SearchPage.qml
         qml/pages/HomePage.qml
+        qml/pages/ChooseLocationDialog.qml
         qml/pages/StationDetailsPage.qml
         rpm/harbour-tanken.spec
         ${TsFiles})

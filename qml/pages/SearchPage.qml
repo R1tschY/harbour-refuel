@@ -1,8 +1,9 @@
 import QtQuick 2.0
 import QtPositioning 5.2
+import QtLocation 5.3
 import Sailfish.Silica 1.0
 
-import de.richardliebscher.tanken 0.1
+import de.richardliebscher.refuel 0.1
 
 Dialog {
     id: page
@@ -24,8 +25,62 @@ Dialog {
             width: page.width
 
             DialogHeader {
+                width: parent.width
                 acceptText: qsTr("Search")
                 cancelText: qsTr("Cancel")
+            }
+
+            Plugin {
+                    id: mapPlugin
+                    name: "osm" // "mapboxgl", "esri", ...
+                    // specify plugin parameters if necessary
+                    // PluginParameter {
+                    //     name:
+                    //     value:
+                    // }
+                }
+
+            Map {
+                id: map
+                plugin: mapPlugin
+                width: parent.width
+                height: Theme.paddingLarge * 20
+                zoomLevel: 14
+
+                center {
+                    latitude: -27.5796
+                    longitude: 153.1003
+                }
+
+                // Enable pinch gestures to zoom in and out
+                gesture.flickDeceleration: 3000
+                gesture.enabled: true
+
+            }
+
+
+
+            ValueButton {
+                id: locationControl
+
+                property real lat: -1
+                property real lng: -1
+                property bool currentPos: true
+
+                label: qsTr("Near")
+                value: qsTr("Current Position")
+
+                BusyIndicator {
+                    running: locationControl.lat === -1
+                    size: BusyIndicatorSize.Small
+                    anchors {
+                        right: parent.right
+                        rightMargin: Theme.horizontalPageMargin
+                        verticalCenter: parent.verticalCenter
+                    }
+                }
+
+                onClicked: pageStack.push(locationChooserDialogComponent)
             }
 
             ComboBox {
@@ -73,6 +128,7 @@ Dialog {
                         model: [1, 2, 5, 10, 15, 20, 25]
                         MenuItem {
                             readonly property string radius: modelData
+
                             text: modelData + " km"
                         }
                     }
