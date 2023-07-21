@@ -15,6 +15,8 @@ Dialog {
 //        active: gpsActive
 //    }
 
+    canAccept: locationChooser.validPosition
+
     SilicaFlickable {
         id: content
         anchors.fill: parent
@@ -38,11 +40,17 @@ Dialog {
                 property variant coordinate: QtPositioning.coordinate()
                 property string address
                 property bool currentPos: false
+                readonly property bool validPosition: !isNaN(coordinate.latitude)
+
 
                 label: qsTr("Near")
                 value: currentPos
                        ? qsTr("Current Position")
                        : address
+
+                labelColor: highlighted
+                            ? Theme.highlightColor
+                            : validPosition ? Theme.primaryColor : Theme.errorColor
 
                 BusyIndicator {
                     running: locationChooser.currentPos && coordinate.valid // TODO
