@@ -32,12 +32,14 @@ Page {
                 placeholderText: qsTr("Search address")
                 focus: true
 
-                EnterKey.enabled: text.length > 0
-                EnterKey.iconSource: "image://theme/icon-m-search"
-                EnterKey.onClicked: geocodeModel.search(searchField.text)
+                EnterKey.enabled: listView.count > 0
+                EnterKey.iconSource: "image://theme/icon-m-enter-accept"
+                EnterKey.onClicked: listView.accept(geocodeModel.get(0))
 
                 onTextChanged: geocodeModel.search(searchField.text)
             }
+
+            Component.onCompleted: searchField.forceActiveFocus()
         }
 
         model: GeocodeModel {
@@ -59,11 +61,7 @@ Page {
         delegate: BackgroundItem {
             id: delegateItem
 
-            onClicked: {
-                page.location = locationData
-                page.selected(locationData)
-                pageStack.pop()
-            }
+            onClicked: listView.accept(locationData)
 
             Label {
                 id: mainLabel
@@ -95,6 +93,12 @@ Page {
                 highlighted: delegateItem.highlighted
                 color: highlighted ? Theme.secondaryHighlightColor : Theme.secondaryColor
             }
+        }
+
+        function accept(location) {
+            page.location = location
+            page.selected(location)
+            pageStack.pop()
         }
 
         ViewPlaceholder {

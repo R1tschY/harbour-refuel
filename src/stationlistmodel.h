@@ -55,7 +55,7 @@ private:
     QVector<StationWithPrice> m_stations;
     TankerKoenigProvider m_provider;
     QString m_errorString;
-    TankerKoenigPriceReply* m_reply;
+    TankerKoenigPriceReply* m_reply = nullptr;
     Status m_status = Status::Null;
 
     void onSearchResults();
