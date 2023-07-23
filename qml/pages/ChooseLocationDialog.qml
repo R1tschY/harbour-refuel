@@ -46,6 +46,7 @@ Page {
             id: geocodeModel
             plugin: locationPlugin
             autoUpdate: false
+            bounds: provider.boundingBox
             limit: 10
 
             function search(query) {

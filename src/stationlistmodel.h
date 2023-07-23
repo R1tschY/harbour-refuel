@@ -10,6 +10,7 @@ class StationListModel : public QAbstractListModel
 {
     Q_OBJECT
     Q_PROPERTY(QString errorString READ errorString NOTIFY errorStringChanged)
+    Q_PROPERTY(FuelPriceProvider* provider READ provider WRITE setProvider NOTIFY providerChanged)
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
 
 public:
@@ -37,6 +38,9 @@ public:
     Status status() const { return m_status; }
     QString errorString() const { return m_errorString; }
 
+    FuelPriceProvider* provider() const { return m_provider; }
+    void setProvider(FuelPriceProvider* provider);
+
     int rowCount(const QModelIndex &parent = QModelIndex()) const override;
 
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
@@ -50,12 +54,13 @@ public:
 signals:
     void errorStringChanged();
     void statusChanged();
+    void providerChanged();
 
 private:
     QVector<StationWithPrice> m_stations;
-    TankerKoenigProvider m_provider;
+    FuelPriceProvider* m_provider = nullptr;
     QString m_errorString;
-    TankerKoenigPriceReply* m_reply = nullptr;
+    FuelPriceReply* m_reply = nullptr;
     Status m_status = Status::Null;
 
     void onSearchResults();

@@ -29,8 +29,8 @@ QGeoRectangle TankerKoenigProvider::boundingBox() const
     // > curl "https://nominatim.openstreetmap.org/search?q=germany&format=json&limit=1"
     //   | jq '.[0].boundingbox'
     return QGeoRectangle(
-                QGeoCoordinate(5.8663153, 47.2701114),
-                QGeoCoordinate(15.0419309, 55.099161));
+                QGeoCoordinate(47.2701114, 5.8663153),
+                QGeoCoordinate(55.099161, 15.0419309));
 }
 
 void TankerKoenigProvider::setUserAgent(const QString &value)

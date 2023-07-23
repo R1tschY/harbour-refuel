@@ -1,8 +1,20 @@
 #include "stationlistmodel.h"
 
+#include <QLoggingCategory>
+
+static Q_LOGGING_CATEGORY(logger, "refuel.models");
+
 StationListModel::StationListModel(QObject *parent)
     : QAbstractListModel(parent)
 { }
+
+void StationListModel::setProvider(FuelPriceProvider *provider)
+{
+    if (provider != m_provider) {
+        m_provider = provider;
+        emit providerChanged();
+    }
+}
 
 void StationListModel::setError(const QString &errorString)
 {
@@ -81,6 +93,10 @@ QHash<int, QByteArray> StationListModel::roleNames() const
 void StationListModel::search(
         const QGeoCoordinate& coordinate, float radius, int fuel)
 {
+    if (!m_provider) {
+        return;
+    }
+
     if (m_reply) {
         m_reply->abort();
         m_reply = nullptr;
@@ -93,14 +109,14 @@ void StationListModel::search(
     setStatus(Status::Loading);
     setError({});
 
-    auto reply = m_provider.list(
+    m_reply = m_provider->list(
                 coordinate, radius, (FuelPriceProvider::Fuel) fuel,
                 FuelPriceProvider::Sorting::Price);
-    connect(reply, &TankerKoenigPriceReply::finished,
+    connect(m_reply, &TankerKoenigPriceReply::finished,
             this, &StationListModel::onSearchResults);
-    connect(reply, &TankerKoenigPriceReply::errorOccured,
+    connect(m_reply, &TankerKoenigPriceReply::errorOccured,
             this, &StationListModel::onSearchError);
-    connect(reply, &QObject::destroyed, this, [this]() { m_reply = nullptr; });
+    connect(m_reply, &QObject::destroyed, this, [this]() { m_reply = nullptr; });
 }
 
 void StationListModel::reset()

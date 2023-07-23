@@ -82,24 +82,15 @@ Dialog {
                 menu: ContextMenu {
                     Repeater {
                         model: [
-                            {
-                                name: qsTr("Super E5"),
-                                fuel: FuelPriceProvider.SuperE5
-                            },
-                            {
-                                name: qsTr("Super E10"),
-                                fuel: FuelPriceProvider.SuperE10
-                            },
-                            {
-                                name: qsTr("Diesel"),
-                                fuel: FuelPriceProvider.Diesel
-                            }
+                            FuelPriceProvider.SuperE5,
+                            FuelPriceProvider.SuperE10,
+                            FuelPriceProvider.Diesel
                         ]
 
                         MenuItem {
-                            readonly property int fuel: modelData.fuel
+                            readonly property int fuel: modelData
 
-                            text: modelData.name
+                            text: formatFuel(fuel)
                         }
                     }
                 }
@@ -131,10 +122,23 @@ Dialog {
         }
     }
 
-    onAccepted:
+    onAccepted: {
+        var fuel = fuelTypeChooser.currentItem.fuel
+        var radius = radiusChooser.currentItem.radius
+        var coordinate = locationChooser.coordinate
+        var name = locationChooser.value
+        var currentPos = locationChooser.currentPos
+
         pageStack.push(
                     Qt.resolvedUrl("StationListPage.qml"),
-                    { fuel: fuelTypeChooser.currentItem.fuel,
-                        radius: radiusChooser.currentItem.radius,
-                        coordinate: locationChooser.coordinate })
+                    { fuel: fuel, radius: radius, coordinate: coordinate })
+
+        lastSearchesModel.add(
+                    Date.now(),
+                    "tankerkoenig",
+                    locationChooser.value,
+                    currentPos ? QtPositioning.coordinate() : coordinate,
+                    fuel,
+                    radius)
+    }
 }

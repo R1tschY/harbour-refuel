@@ -15,7 +15,7 @@ class TankerKoenigProvider : public FuelPriceProvider
 public:
     explicit TankerKoenigProvider(QObject *parent = nullptr);
 
-    QGeoRectangle boundingBox() const;
+    QGeoRectangle boundingBox() const override;
 
     QString userAgent() const { return m_userAgent; }
     void setUserAgent(const QString& value);

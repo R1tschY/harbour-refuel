@@ -1,7 +1,7 @@
 project(harbour-tanken CXX)
 cmake_minimum_required(VERSION 3.5)
 
-find_package (Qt5 COMPONENTS Core Network Qml Gui Quick Location REQUIRED)
+find_package (Qt5 COMPONENTS Core Network Qml Gui Sql Quick Positioning Location REQUIRED)
 
 include(FindPkgConfig)
 pkg_search_module(SAILFISH sailfishapp REQUIRED)
@@ -14,6 +14,8 @@ add_executable(harbour-tanken
 
     src/osmimproved/photongeocoder.h src/osmimproved/photongeocoder.cpp
     src/osmimproved/osmimprovedplugin.h src/osmimproved/osmimprovedplugin.cpp
+
+    src/models/sqlquerymodel.h src/models/sqlquerymodel.cpp
 
     src/harbour-tanken.cpp
     src/tankerkoenigapirequest.h src/tankerkoenigapirequest.cpp
@@ -29,7 +31,7 @@ target_include_directories(harbour-tanken PRIVATE
     ${SAILFISH_INCLUDE_DIRS}
 >)
 target_link_libraries(harbour-tanken
-    Qt5::Quick Qt5::Location
+    Qt5::Quick Qt5::Sql Qt5::Positioning Qt5::Location
     ${SAILFISH_LDFLAGS}
 )
 
@@ -71,6 +73,8 @@ add_custom_target(distfiles
         qml/pages/HomePage.qml
         qml/pages/ChooseLocationDialog.qml
         qml/pages/StationDetailsPage.qml
+        qml/components/LastSearchesModel.qml
+        qml/components/DbConnection.qml
         rpm/harbour-tanken.spec
         ${TsFiles})
 

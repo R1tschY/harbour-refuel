@@ -20,6 +20,8 @@ Page {
             id: listModel
         }
 
+        Component.onCompleted: listModel.provider = provider
+
         anchors.fill: parent
 
         header: PageHeader {
