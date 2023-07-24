@@ -1,0 +1,3 @@
+#pragma once
+
+#cmakedefine TANKERKOENIG_APIKEY "@TANKERKOENIG_APIKEY@"

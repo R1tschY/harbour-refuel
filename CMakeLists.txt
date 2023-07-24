@@ -6,11 +6,20 @@ find_package (Qt5 COMPONENTS Core Network Qml Gui Sql Quick Positioning Location
 include(FindPkgConfig)
 pkg_search_module(SAILFISH sailfishapp REQUIRED)
 
+set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
+set(TANKERKOENIG_APIKEY "" CACHE STRING "Tankerkönig API Key (https://creativecommons.tankerkoenig.de/)")
+if(NOT "${TANKERKOENIG_APIKEY}" MATCHES "^[0-9a-f\\-]+$")
+    message(SEND_ERROR "TANKERKOENIG_APIKEY missing or invalid: '${TANKERKOENIG_APIKEY}'")
+endif()
+
+configure_file(src/config.h.in config.h @ONLY)
+
 add_executable(harbour-tanken
     src/qtployfill.h
+    src/char_sequence.h
 
     src/osmimproved/photongeocoder.h src/osmimproved/photongeocoder.cpp
     src/osmimproved/osmimprovedplugin.h src/osmimproved/osmimprovedplugin.cpp
@@ -27,9 +36,8 @@ target_compile_definitions(harbour-tanken PRIVATE
     QT_STATICPLUGIN
 )
 target_include_directories(harbour-tanken PRIVATE
-    $<BUILD_INTERFACE:
-    ${SAILFISH_INCLUDE_DIRS}
->)
+    $<BUILD_INTERFACE: ${SAILFISH_INCLUDE_DIRS} >
+    "${CMAKE_CURRENT_BINARY_DIR}")
 target_link_libraries(harbour-tanken
     Qt5::Quick Qt5::Sql Qt5::Positioning Qt5::Location
     ${SAILFISH_LDFLAGS}
@@ -76,6 +84,7 @@ add_custom_target(distfiles
         qml/components/LastSearchesModel.qml
         qml/components/DbConnection.qml
         rpm/harbour-tanken.spec
+        README.md
         ${TsFiles})
 
 # Tell Qt Creator where the application executable(s) would be located on the

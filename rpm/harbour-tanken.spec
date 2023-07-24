@@ -22,7 +22,7 @@ Requires: qt5-qtdeclarative-import-location
 Requires: qt5-qtdeclarative-import-positioning
 
 %description
-Search for petrol stations prices in Germany
+Search for fuel stations prices in Germany
 
 
 %prep
@@ -30,9 +30,12 @@ Search for petrol stations prices in Germany
 
 %build
 
+source %{_sourcedir}/../.env
+
 cmake \
   -DCMAKE_INSTALL_PREFIX=/usr \
   -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+  -DTANKERKOENIG_APIKEY=$TANKERKOENIG_APIKEY \
   -DSAILFISHOS=ON
 cmake --build . -- %{?_smp_mflags}
 

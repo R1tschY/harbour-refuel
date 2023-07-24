@@ -7,6 +7,13 @@
 #include <QGeoRectangle>
 
 #include "fuelpriceprovider.h"
+#include "config.h"
+
+struct TankerKoenigApiKey {
+    constexpr static const char* get() {
+        return TANKERKOENIG_APIKEY;
+    }
+};
 
 class TankerKoenigProvider : public FuelPriceProvider
 {

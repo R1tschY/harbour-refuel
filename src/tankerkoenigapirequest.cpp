@@ -10,18 +10,20 @@
 #include <QGeoCoordinate>
 
 #include "qtployfill.h"
+#include "char_sequence.h"
 
 static Q_LOGGING_CATEGORY(logger, "refuel.tankerkoenig");
 
 static const QUrl LIST_URL = QUrl(QStringLiteral("https://creativecommons.tankerkoenig.de/json/list.php"));
 
+static const QString API_KEY = charSeqToQString(
+            make_char_sequence<TankerKoenigApiKey>{});
 
 TankerKoenigProvider::TankerKoenigProvider(QObject *parent)
     : FuelPriceProvider(parent)
     , m_network()
-    , m_apiKey(QStringLiteral("00000000-0000-0000-0000-000000000002"))
-{
-}
+    , m_apiKey(API_KEY)
+{ }
 
 QGeoRectangle TankerKoenigProvider::boundingBox() const
 {
