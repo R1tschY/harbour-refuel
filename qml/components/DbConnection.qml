@@ -10,7 +10,7 @@ QtObject {
         if (dataBaseId) {
             _db = LocalStorage.openDatabaseSync(dataBaseId, "", "", 1000000)
             if (_db.version !== "1") {
-                _db.changeVersion("0", "1", function(tx) {
+                _db.changeVersion("", "1", function(tx) {
                     tx.executeSql(
                                 "CREATE TABLE last_searches (" +
                                 "  timestamp INTEGER NOT NULL," +
