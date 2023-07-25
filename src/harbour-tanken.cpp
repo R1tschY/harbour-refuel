@@ -2,6 +2,8 @@
 #include <QtQuick>
 #endif
 #include <QtQml>
+#include <QGuiApplication>
+#include <QQuickView>
 #include <QScopedPointer>
 
 #include <sailfishapp.h>

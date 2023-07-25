@@ -1,5 +1,6 @@
 #include "tankerkoenigapirequest.h"
 
+#include <QUrlQuery>
 #include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
