@@ -1,4 +1,4 @@
-project(harbour-tanken CXX)
+project(harbour-refuel CXX)
 cmake_minimum_required(VERSION 3.5)
 
 find_package (Qt5 COMPONENTS Core Network Qml Gui Sql Quick Positioning Location REQUIRED)
@@ -17,7 +17,7 @@ endif()
 
 configure_file(src/config.h.in config.h @ONLY)
 
-add_executable(harbour-tanken
+add_executable(harbour-refuel
     src/qtployfill.h
     src/char_sequence.h
 
@@ -26,46 +26,46 @@ add_executable(harbour-tanken
 
     src/models/sqlquerymodel.h src/models/sqlquerymodel.cpp
 
-    src/harbour-tanken.cpp
+    src/harbour-refuel.cpp
     src/tankerkoenigapirequest.h src/tankerkoenigapirequest.cpp
     src/fuelpriceprovider.h src/fuelpriceprovider.cpp
     src/stationlistmodel.h src/stationlistmodel.cpp
 )
-target_compile_definitions(harbour-tanken PRIVATE
+target_compile_definitions(harbour-refuel PRIVATE
     $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>
     QT_STATICPLUGIN
 )
-target_include_directories(harbour-tanken PRIVATE
+target_include_directories(harbour-refuel PRIVATE
     $<BUILD_INTERFACE: ${SAILFISH_INCLUDE_DIRS} >
     "${CMAKE_CURRENT_BINARY_DIR}")
-target_link_libraries(harbour-tanken
+target_link_libraries(harbour-refuel
     Qt5::Quick Qt5::Sql Qt5::Positioning Qt5::Location
     ${SAILFISH_LDFLAGS}
 )
 
-install(TARGETS harbour-tanken
+install(TARGETS harbour-refuel
     RUNTIME DESTINATION bin
 )
 install(DIRECTORY qml
-    DESTINATION share/harbour-tanken
+    DESTINATION share/harbour-refuel
 )
 install(DIRECTORY translations
-    DESTINATION share/harbour-tanken
+    DESTINATION share/harbour-refuel
     FILES_MATCHING PATTERN "*.qm"
 )
-install(FILES harbour-tanken.desktop
+install(FILES harbour-refuel.desktop
     DESTINATION share/applications
 )
-install(FILES icons/86x86/harbour-tanken.png
+install(FILES icons/86x86/harbour-refuel.png
     DESTINATION share/icons/hicolor/86x86/apps
 )
-install(FILES icons/108x108/harbour-tanken.png
+install(FILES icons/108x108/harbour-refuel.png
     DESTINATION share/icons/hicolor/108x108/apps
 )
-install(FILES icons/128x128/harbour-tanken.png
+install(FILES icons/128x128/harbour-refuel.png
     DESTINATION share/icons/hicolor/128x128/apps
 )
-install(FILES icons/172x172/harbour-tanken.png
+install(FILES icons/172x172/harbour-refuel.png
     DESTINATION share/icons/hicolor/172x172/apps
 )
 
@@ -73,8 +73,8 @@ install(FILES icons/172x172/harbour-tanken.png
 FILE(GLOB TsFiles "translations/*.ts")
 add_custom_target(distfiles
     SOURCES
-        harbour-tanken.desktop
-        qml/harbour-tanken.qml
+        harbour-refuel.desktop
+        qml/harbour-refuel.qml
         qml/cover/CoverPage.qml
         qml/pages/StationListPage.qml
         qml/pages/SearchPage.qml
@@ -83,7 +83,7 @@ add_custom_target(distfiles
         qml/pages/StationDetailsPage.qml
         qml/components/LastSearchesModel.qml
         qml/components/DbConnection.qml
-        rpm/harbour-tanken.spec
+        rpm/harbour-refuel.spec
         README.md
         ${TsFiles})
 
@@ -100,6 +100,6 @@ add_custom_target(distfiles
 # format.
 file(WRITE "${CMAKE_BINARY_DIR}/QtCreatorDeployment.txt"
     "${CMAKE_INSTALL_PREFIX}
-${CMAKE_BINARY_DIR}/harbour-tanken:bin
+${CMAKE_BINARY_DIR}/harbour-refuel:bin
 ")
 

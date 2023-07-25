@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+X-Nemo-Application-Type=silica-qt5
+Icon=harbour-refuel
+Exec=harbour-refuel
+Name=Refuel
+Name[de]=Auftanken
+
+[X-Sailjail]
+OrganizationName=de.richardliebscher
+ApplicationName=Refuel
+Permissions=Internet;Location
