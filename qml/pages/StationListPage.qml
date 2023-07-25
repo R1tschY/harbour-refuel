@@ -142,8 +142,19 @@ Page {
             running: listModel.status === StationListModel.Loading
         }
 
+        PullDownMenu {
+            MenuItem {
+                text: qsTr("Refresh")
+                onClicked: page._update()
+            }
+        }
+
         VerticalScrollDecorator { flickable: listView }
     }
 
-    Component.onCompleted: listModel.search(coordinate, radius, fuel)
+    function _update() {
+        listModel.search(coordinate, radius, fuel)
+    }
+
+    Component.onCompleted: _update()
 }
