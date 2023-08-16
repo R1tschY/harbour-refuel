@@ -13,6 +13,11 @@ ApplicationWindow {
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
     allowedOrientations: defaultAllowedOrientations
 
+    FontLoader {
+        id: dseg7
+        source: "/usr/share/fonts/DSEG7Modern-Regular.ttf"
+    }
+
     Plugin {
         id: locationPlugin
         name: "osmimproved"

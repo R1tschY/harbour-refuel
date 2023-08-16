@@ -70,6 +70,10 @@ install(FILES icons/172x172/harbour-refuel.png
     DESTINATION share/icons/hicolor/172x172/apps
 )
 
+install(FILES fonts/DSEG7Modern-Regular.ttf
+    DESTINATION share/fonts
+)
+
 # Get the other files reachable from the project tree in Qt Creator
 FILE(GLOB TsFiles "translations/*.ts")
 add_custom_target(distfiles

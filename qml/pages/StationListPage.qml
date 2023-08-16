@@ -45,14 +45,40 @@ Page {
                                          : Theme.secondaryColor
 
             Label {
+                text: "888"
+
+                y: Theme.paddingMedium
+                x: Theme.horizontalPageMargin
+
+                font.pixelSize: Theme.fontSizeExtraLarge
+                font.family: dseg7.name
+                color: secondaryColor
+                opacity: 0.35
+            }
+
+            Label {
                 id: priceLabel
 
                 text: mainPrice
 
+                y: Theme.paddingMedium
                 x: Theme.horizontalPageMargin
 
                 font.pixelSize: Theme.fontSizeExtraLarge
+                font.family: dseg7.name
                 color: primaryColor
+            }
+
+            Label {
+                text: "8"
+
+                y: Theme.paddingMedium
+                anchors.left: priceLabel.right
+
+                font.pixelSize: Theme.fontSizeSmall
+                font.family: dseg7.name
+                color: secondaryColor
+                opacity: 0.35
             }
 
             Label {
@@ -60,10 +86,11 @@ Page {
 
                 text: decimalPrice
 
-                y: Theme.paddingSmall
+                y: Theme.paddingMedium
                 anchors.left: priceLabel.right
 
                 font.pixelSize: Theme.fontSizeSmall
+                font.family: dseg7.name
                 color: secondaryColor
             }
 
