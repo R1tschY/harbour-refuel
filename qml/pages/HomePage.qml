@@ -142,6 +142,14 @@ Page {
                 text: qsTr("New search")
                 onClicked: pageStack.push(Qt.resolvedUrl("SearchPage.qml"));
             }
+
+        }
+
+        PushUpMenu {
+            MenuItem {
+                text: qsTr("About")
+                onClicked: pageStack.push(Qt.resolvedUrl("AboutPage.qml"));
+            }
         }
 
         VerticalScrollDecorator { flickable: content }

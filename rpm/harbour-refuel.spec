@@ -1,10 +1,10 @@
-Name:       harbour-tanken
+Name:       harbour-refuel
 
 Summary:    Refuel
 Version:    0.1
 Release:    1
-License:    LICENSE
-URL:        http://example.org/
+License:    GPLv3
+URL:        https://github.com/R1tschY/harbour-refuel
 Source0:    %{name}-%{version}.tar.bz2
 Requires:   sailfishsilica-qt5 >= 0.10.9
 BuildRequires:  pkgconfig(sailfishapp) >= 1.0.2
@@ -22,7 +22,7 @@ Requires: qt5-qtdeclarative-import-location
 Requires: qt5-qtdeclarative-import-positioning
 
 %description
-Search for fuel stations prices in Germany
+Search for fuel station prices in Germany
 
 
 %prep
@@ -35,6 +35,8 @@ source %{_sourcedir}/../.env
 cmake \
   -DCMAKE_INSTALL_PREFIX=/usr \
   -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+  -DPACKAGE_VERSION="%{version}" \
+  -DPACKAGE_RELEASE="%{release}" \
   -DTANKERKOENIG_APIKEY=$TANKERKOENIG_APIKEY \
   -DSAILFISHOS=ON
 cmake --build . -- %{?_smp_mflags}

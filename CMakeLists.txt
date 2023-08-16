@@ -1,5 +1,5 @@
-project(harbour-refuel CXX)
 cmake_minimum_required(VERSION 3.5)
+project(harbour-refuel VERSION ${PACKAGE_VERSION} LANGUAGES CXX)
 
 find_package (Qt5 COMPONENTS Core Network Qml Gui Sql Quick Positioning Location REQUIRED)
 
@@ -30,6 +30,7 @@ add_executable(harbour-refuel
     src/tankerkoenigapirequest.h src/tankerkoenigapirequest.cpp
     src/fuelpriceprovider.h src/fuelpriceprovider.cpp
     src/stationlistmodel.h src/stationlistmodel.cpp
+    src/station.h src/station.cpp
 )
 target_compile_definitions(harbour-refuel PRIVATE
     $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>
@@ -79,6 +80,7 @@ add_custom_target(distfiles
         qml/pages/StationListPage.qml
         qml/pages/SearchPage.qml
         qml/pages/HomePage.qml
+        qml/pages/AboutPage.qml
         qml/pages/ChooseLocationDialog.qml
         qml/pages/StationDetailsPage.qml
         qml/components/LastSearchesModel.qml
