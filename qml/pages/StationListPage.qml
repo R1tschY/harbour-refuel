@@ -110,13 +110,7 @@ Page {
 
             onClicked: pageStack.push(
                            Qt.resolvedUrl("StationDetailsPage.qml"),
-                           {
-                               stationId: stationId,
-                               stationName: name,
-                               stationBrand: brand,
-                               stationAddress: address,
-                               stationIsOpen: isOpen
-                           })
+                           { stationId: stationId })
 
         }
 
