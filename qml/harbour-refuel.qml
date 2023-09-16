@@ -50,6 +50,10 @@ ApplicationWindow {
     }
 
     function formatPrice(price) {
+        if (isNaN(price)) {
+            return ["-.--", "-"]
+        }
+
         var str = price.toFixed(3)
         return [str.slice(0, -1), str.slice(-1)]
     }

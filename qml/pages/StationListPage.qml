@@ -2,6 +2,7 @@ import QtQuick 2.0
 import Sailfish.Silica 1.0
 
 import de.richardliebscher.refuel 0.1
+import "../components"
 
 
 Page {
@@ -34,8 +35,6 @@ Page {
             contentHeight: Theme.itemSizeMedium
 
             property var priceParts: formatPrice(price)
-            property string mainPrice: priceParts[0]
-            property string decimalPrice: priceParts[1]
 
             property var primaryColor: delegate.highlighted
                                        ? Theme.highlightColor
@@ -44,54 +43,15 @@ Page {
                                          ? Theme.secondaryHighlightColor
                                          : Theme.secondaryColor
 
-            Label {
-                text: "888"
-
-                y: Theme.paddingMedium
-                x: Theme.horizontalPageMargin
-
-                font.pixelSize: Theme.fontSizeExtraLarge
-                font.family: dseg7.name
-                color: secondaryColor
-                opacity: 0.35
-            }
-
-            Label {
+            PriceDisplay {
                 id: priceLabel
 
-                text: mainPrice
+                y: Theme.paddingMedium * 1.1
+                x: Theme.horizontalPageMargin * 0.5
 
-                y: Theme.paddingMedium
-                x: Theme.horizontalPageMargin
-
-                font.pixelSize: Theme.fontSizeExtraLarge
-                font.family: dseg7.name
                 color: primaryColor
-            }
-
-            Label {
-                text: "8"
-
-                y: Theme.paddingMedium
-                anchors.left: priceLabel.right
-
-                font.pixelSize: Theme.fontSizeSmall
-                font.family: dseg7.name
-                color: secondaryColor
-                opacity: 0.35
-            }
-
-            Label {
-                id: decimalPriceLabel
-
-                text: decimalPrice
-
-                y: Theme.paddingMedium
-                anchors.left: priceLabel.right
-
-                font.pixelSize: Theme.fontSizeSmall
-                font.family: dseg7.name
-                color: secondaryColor
+                mainPrice: priceParts[0]
+                decimalPrice: priceParts[1]
             }
 
             Label {
@@ -101,7 +61,8 @@ Page {
 
                 anchors {
                     bottom: parent.bottom
-                    right: decimalPriceLabel.right
+                    bottomMargin: Theme.paddingSmall
+                    right: priceLabel.right
                     rightMargin: Theme.paddingSmall
                 }
 
@@ -115,10 +76,12 @@ Page {
                 text: brand || name
 
                 anchors {
-                    verticalCenter: priceLabel.verticalCenter
-                    left: decimalPriceLabel.right
-                    leftMargin: Theme.paddingSmall
+                    baseline: priceLabel.baseline
+                    baselineOffset: -Theme.paddingSmall
+                    left: priceLabel.right
+                    leftMargin: Theme.paddingMedium
                     right: parent.right
+                    rightMargin: Theme.horizontalPageMargin
                 }
 
                 font.pixelSize: Theme.fontSizeLarge
@@ -132,10 +95,12 @@ Page {
                 text: address
 
                 anchors {
-                    left: decimalPriceLabel.right
-                    leftMargin: Theme.paddingSmall
+                    left: priceLabel.right
+                    leftMargin: Theme.paddingMedium
                     right: parent.right
+                    rightMargin: Theme.horizontalPageMargin
                     bottom: parent.bottom
+                    bottomMargin: Theme.paddingSmall
                 }
 
                 color: secondaryColor
