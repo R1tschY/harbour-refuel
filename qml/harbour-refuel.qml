@@ -15,7 +15,7 @@ ApplicationWindow {
 
     FontLoader {
         id: dseg7
-        source: "/usr/share/fonts/DSEG7Modern-Regular.ttf"
+        source: "/usr/share/harbour-refuel/fonts/DSEG7Modern-Regular.ttf"
     }
 
     Plugin {

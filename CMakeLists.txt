@@ -71,7 +71,7 @@ install(FILES icons/172x172/harbour-refuel.png
 )
 
 install(FILES fonts/DSEG7Modern-Regular.ttf
-    DESTINATION share/fonts
+    DESTINATION share/harbour-refuel/fonts
 )
 
 # Get the other files reachable from the project tree in Qt Creator
