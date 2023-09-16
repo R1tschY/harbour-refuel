@@ -11,6 +11,8 @@
 #include "fuelpriceprovider.h"
 #include "osmimproved/osmimprovedplugin.h"
 #include "models/sqlquerymodel.h"
+#include "config.h"
+#include "station.h"
 
 Q_IMPORT_PLUGIN(OsmImprovedPlugin)
 
@@ -20,6 +22,8 @@ int main(int argc, char *argv[])
                 "de.richardliebscher.refuel", 0, 1, "StationListModel");
     qmlRegisterType<TankerKoenigProvider>(
                 "de.richardliebscher.refuel", 0, 1, "TankerKoenigProvider");
+    qmlRegisterType<Station>(
+                "de.richardliebscher.refuel", 0, 1, "Station");
     qmlRegisterType<SqlQueryModel>(
                 "de.richardliebscher.refuel", 0, 1, "SqlQueryModel");
     qmlRegisterUncreatableType<FuelPriceProvider>(
@@ -28,6 +32,8 @@ int main(int argc, char *argv[])
 
     QScopedPointer<QGuiApplication> app { SailfishApp::application(argc, argv) };
     QScopedPointer<QQuickView> view { SailfishApp::createView() };
+
+    app->setApplicationVersion(QStringLiteral(PACKAGE_COMPLETE_VERSION));
 
     QQmlEngine *engine = view->engine();
     engine->rootContext()->setContextProperty(

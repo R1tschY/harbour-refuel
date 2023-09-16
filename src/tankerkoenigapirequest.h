@@ -31,6 +31,8 @@ public:
             const QGeoCoordinate& coordinate, double radius,
             FuelPriceProvider::Fuel spirit, FuelPriceProvider::Sorting sorting);
 
+    StationDetailsReply *stationForId(const QString &id) override;
+
 signals:
     void userAgentChanged();
 
@@ -50,8 +52,18 @@ public:
             QNetworkReply* reply);
 
 private:
-    QNetworkReply* m_reply;
+    void onNetworkReplyFinished();
+    void onNetworkReplyError();
+};
 
+class TankerKoenigStationDetailsReply : public StationDetailsReply
+{
+    Q_OBJECT
+public:
+    explicit TankerKoenigStationDetailsReply(
+            const QString& stationId, QNetworkReply* reply);
+
+private:
     void onNetworkReplyFinished();
     void onNetworkReplyError();
 };

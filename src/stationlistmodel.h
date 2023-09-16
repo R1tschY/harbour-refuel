@@ -9,9 +9,9 @@
 class StationListModel : public QAbstractListModel
 {
     Q_OBJECT
-    Q_PROPERTY(QString errorString READ errorString NOTIFY errorStringChanged)
     Q_PROPERTY(FuelPriceProvider* provider READ provider WRITE setProvider NOTIFY providerChanged)
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
+    Q_PROPERTY(QString errorString READ errorString NOTIFY errorStringChanged)
 
 public:
     explicit StationListModel(QObject *parent = nullptr);

@@ -6,12 +6,33 @@ FuelPriceProvider::FuelPriceProvider(QObject *parent)
     : QObject(parent)
 { }
 
-void FuelPriceReply::abort()
+void Reply::abort()
 {
     if (!m_finished) {
         setFinished();
         emit aborted();
     }
+}
+
+Reply::Reply() = default;
+
+void Reply::setError(Error error, const QString &errorString)
+{
+    if (m_finished) return;
+
+    m_finished = true;
+    m_error = error;
+    m_errorString = errorString;
+    clear();
+    emit errorOccured();
+}
+
+void Reply::setFinished()
+{
+    if (m_finished) return;
+
+    m_finished = true;
+    emit finished();
 }
 
 FuelPriceReply::FuelPriceReply(const QGeoCoordinate &coordinate, double radius, FuelPriceProvider::Fuel fuel, FuelPriceProvider::Sorting sorting)
@@ -21,24 +42,6 @@ FuelPriceReply::FuelPriceReply(const QGeoCoordinate &coordinate, double radius, 
     , m_sorting(sorting)
 { }
 
-void FuelPriceReply::setError(Error error, const QString &errorString)
-{
-    if (m_finished) return;
-
-    m_finished = true;
-    m_error = error;
-    m_errorString = errorString;
-    m_stations.clear();
-    emit errorOccured();
-}
-
-void FuelPriceReply::setFinished()
-{
-    if (m_finished) return;
-
-    m_finished = true;
-    emit finished();
-}
 
 void FuelPriceReply::addStation(const StationWithPrice &station)
 {
@@ -52,3 +55,24 @@ void FuelPriceReply::setStations(const QVector<StationWithPrice> &stations)
 
 FuelPriceReply::~FuelPriceReply() = default;
 
+void FuelPriceReply::clear()
+{
+    m_stations.clear();
+}
+
+StationDetailsReply::StationDetailsReply(const QString &stationId)
+    : m_stationId(stationId)
+{ }
+
+
+StationDetailsReply::~StationDetailsReply() = default;
+
+void StationDetailsReply::setStationDetails(const StationDetails &station)
+{
+    m_stationDetails = station;
+}
+
+void StationDetailsReply::clear()
+{
+    m_stationDetails = StationDetails();
+}
