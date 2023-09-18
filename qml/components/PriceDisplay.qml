@@ -4,23 +4,17 @@ import Sailfish.Silica 1.0
 Label {
     id: root
 
-    property color color: Theme.highlightColor
-
     property alias mainPrice: root.text
     property alias decimalPrice: decimalPriceLabel.text
 
-    property var primaryColor: highlighted
-                               ? Theme.highlightColor
-                               : Theme.primaryColor
-    property var secondaryColor: highlighted
-                                 ? Theme.secondaryHighlightColor
-                                 : Theme.secondaryColor
+    property color placeholderColor: Theme.secondaryColor
 
     height: pricePlaceholder.height
     width: pricePlaceholder.width + decimalPricePlaceholder.width
 
     font.pixelSize: Theme.fontSizeLarge
     font.family: dseg7.name
+    color: Theme.highlightColor
 
     Label {
         id: pricePlaceholder
@@ -29,7 +23,7 @@ Label {
 
         font.pixelSize: Theme.fontSizeLarge
         font.family: dseg7.name
-        color: root.color
+        color: root.placeholderColor
         opacity: 0.30
         z: -1
     }
@@ -43,7 +37,7 @@ Label {
 
         font.pixelSize: Theme.fontSizeSmall
         font.family: dseg7.name
-        color: root.color
+        color: root.placeholderColor
         opacity: 0.30
     }
 

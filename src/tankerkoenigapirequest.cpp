@@ -239,68 +239,93 @@ TankerKoenigStationDetailsReply::TankerKoenigStationDetailsReply(
     connect(this, &FuelPriceReply::aborted, reply, &QNetworkReply::abort);
 }
 
-static std::optional<OpeningTime::Day> toDay(const QString& text) {
+enum WeekDayBit {
+    Monday,
+    Tuesday,
+    Wednesday,
+    Thursday,
+    Friday,
+    Saturday,
+    Sunday,
+    PublicHoliday
+};
+
+static std::optional<WeekDayBit> toDay(const QStringRef& text) {
     if (text.size() == 2) {
         if (text == QStringLiteral("Mo")) {
-            return OpeningTime::Monday;
+            return WeekDayBit::Monday;
         } else if (text == QStringLiteral("Di")) {
-            return OpeningTime::Tuesday;
+            return WeekDayBit::Tuesday;
         } else if (text == QStringLiteral("Mi")) {
-            return OpeningTime::Wednesday;
+            return WeekDayBit::Wednesday;
         } else if (text == QStringLiteral("Do")) {
-            return OpeningTime::Thursday;
+            return WeekDayBit::Thursday;
         } else if (text == QStringLiteral("Fr")) {
-            return OpeningTime::Friday;
+            return WeekDayBit::Friday;
         } else if (text == QStringLiteral("Sa")) {
-            return OpeningTime::Saturday;
+            return WeekDayBit::Saturday;
         } else if (text == QStringLiteral("So")) {
-            return OpeningTime::Sunday;
+            return WeekDayBit::Sunday;
         }
     }
 
     if (text == QStringLiteral("Montag")) {
-        return OpeningTime::Monday;
+        return WeekDayBit::Monday;
     } else if (text == QStringLiteral("Dienstag")) {
-        return OpeningTime::Tuesday;
+        return WeekDayBit::Tuesday;
     } else if (text == QStringLiteral("Mittwoch")) {
-        return OpeningTime::Wednesday;
+        return WeekDayBit::Wednesday;
     } else if (text == QStringLiteral("Donnerstag")) {
-        return OpeningTime::Thursday;
+        return WeekDayBit::Thursday;
     } else if (text == QStringLiteral("Freitag")) {
-        return OpeningTime::Friday;
+        return WeekDayBit::Friday;
     } else if (text == QStringLiteral("Samstag")) {
-        return OpeningTime::Saturday;
+        return WeekDayBit::Saturday;
     } else if (text == QStringLiteral("Sonntag")) {
-        return OpeningTime::Sunday;
+        return WeekDayBit::Sunday;
+    } else if (text == QStringLiteral("Feiertag")) {
+        return WeekDayBit::PublicHoliday;
     }
 
     return {};
 }
 
-static bool parseFromTo(const QString& text, OpeningTime::Day* from, OpeningTime::Day* to) {
+static OpeningTime::WeekDays parseDays(const QString& text) {
     if (text.contains(QChar('-'))) {
         const auto fromTo = text.split(QChar('-'));
         if (fromTo.size() != 2) {
-            return false;
+            return {};
         }
 
-        const auto maybeFrom = toDay(fromTo.at(0));
-        const auto maybeTo = toDay(fromTo.at(1));
+        const auto maybeFrom = toDay(&fromTo.at(0));
+        const auto maybeTo = toDay(&fromTo.at(1));
         if (maybeFrom.has_value() && maybeTo.has_value()) {
-            *from = maybeFrom.value();
-            *to = maybeTo.value();
-            return true;
+            int days = 0;
+            for (int i = maybeFrom.value(); i <= maybeTo.value(); i++) {
+                days |= 1 << i;
+            }
+            return static_cast<OpeningTime::WeekDays>(days);
         } else {
-            return false;
+            return {};
         }
+    } else if (text == QStringLiteral("täglich ausser Sonn- und Feiertagen")) {
+        return OpeningTime::WeekDay::Monday
+                | OpeningTime::WeekDay::Tuesday
+                | OpeningTime::WeekDay::Wednesday
+                | OpeningTime::WeekDay::Thursday
+                | OpeningTime::WeekDay::Friday
+                | OpeningTime::WeekDay::Saturday;
     } else {
-        auto const singleValue = toDay(text);
-        if (singleValue.has_value()) {
-            *from = *to = singleValue.value();
-            return true;
-        } else {
-            return false;
+        int days = 0;
+        for (auto weekDayStr : text.splitRef(QStringLiteral(", "))) {
+            auto const weekDayBit = toDay(weekDayStr);
+            if (weekDayBit.has_value()) {
+                days |= 1 << weekDayBit.value();
+            } else {
+                return {};
+            }
         }
+        return static_cast<OpeningTime::WeekDays>(days);
     }
 }
 
@@ -364,16 +389,15 @@ void TankerKoenigStationDetailsReply::onNetworkReplyFinished()
         const auto end = QTime::fromString(
                     openingTime.value(QStringLiteral("end")).toString());
 
-        OpeningTime::Day from;
-        OpeningTime::Day to;
-        if (!parseFromTo(text, &from, &to)) {
+        auto days = parseDays(text);
+        if (days == OpeningTime::WeekDay::NoDays) {
             qCWarning(logger)
                     << "Failed to parse opening times date range:"
                     << text;
             continue;
         }
 
-        openingTimesList.push_back(OpeningTime { from, to, start, end });
+        openingTimesList.push_back(OpeningTime { days, text, start, end });
     }
 
     QStringList overridesList;

@@ -49,7 +49,9 @@ Page {
                 y: Theme.paddingMedium * 1.1
                 x: Theme.horizontalPageMargin * 0.5
 
-                color: primaryColor
+                color: delegate.primaryColor
+                placeholderColor: delegate.secondaryColor
+
                 mainPrice: priceParts[0]
                 decimalPrice: priceParts[1]
             }

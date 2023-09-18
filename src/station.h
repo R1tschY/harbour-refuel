@@ -21,7 +21,7 @@ class Station : public QObject
     Q_PROPERTY(QString brand READ brand NOTIFY detailsFetched)
     Q_PROPERTY(QGeoAddress address READ address NOTIFY detailsFetched)
     Q_PROPERTY(QGeoCoordinate coordinate READ coordinate NOTIFY detailsFetched)
-    Q_PROPERTY(QVector<OpeningTime> openingTimes READ openingTimes NOTIFY detailsFetched)
+    Q_PROPERTY(QVariantList openingTimes READ openingTimes NOTIFY detailsFetched)
     Q_PROPERTY(QStringList openingTimesOverrides READ openingTimesOverrides NOTIFY detailsFetched)
     Q_PROPERTY(bool isOpen READ isOpen NOTIFY detailsFetched)
     Q_PROPERTY(bool wholeDay READ wholeDay NOTIFY detailsFetched)
@@ -41,7 +41,7 @@ public:
     QString brand() const { return m_brand; }
     QGeoAddress address() const { return m_address; }
     QGeoCoordinate coordinate() const { return m_coordinate; }
-    QVector<OpeningTime> openingTimes() const { return m_openingTimes; }
+    QVariantList openingTimes() const { return m_openingTimes; }
     QStringList openingTimesOverrides() const { return m_openingTimesOverrides; }
     bool isOpen() const { return m_isOpen; }
     bool wholeDay() const { return m_wholeDay; }
@@ -72,7 +72,7 @@ private:
     QString m_brand;
     QGeoAddress m_address;
     QGeoCoordinate m_coordinate;
-    QVector<OpeningTime> m_openingTimes;
+    QVariantList m_openingTimes;
     QStringList m_openingTimesOverrides;
     QHash<FuelPriceProvider::Fuel, float> m_prices;
     bool m_isOpen;

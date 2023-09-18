@@ -61,48 +61,48 @@ struct StationWithPrice {
 
 class OpeningTime {
     Q_GADGET
-    Q_PROPERTY(Day from READ from CONSTANT FINAL)
-    Q_PROPERTY(Day to READ to CONSTANT FINAL)
+    Q_PROPERTY(WeekDays weekDays READ weekDays CONSTANT FINAL)
+    Q_PROPERTY(QString weekDaysText READ weekDaysText CONSTANT FINAL)
     Q_PROPERTY(QTime start READ start CONSTANT FINAL)
     Q_PROPERTY(QTime end READ end CONSTANT FINAL)
 public:
-    enum Day {
-        Sunday,
-        Monday,
-        Tuesday,
-        Wednesday,
-        Thursday,
-        Friday,
-        Saturday
+    enum WeekDay {
+        NoDays = 0,
+        Monday = 1 << 0,
+        Tuesday = 1 << 1,
+        Wednesday = 1 << 2,
+        Thursday = 1 << 3,
+        Friday = 1 << 4,
+        Saturday = 1 << 5,
+        Sunday = 1 << 6,
+        PublicHoliday = 1 << 7
     };
-    Q_ENUM(Day)
+    Q_DECLARE_FLAGS(WeekDays, WeekDay)
+    Q_FLAG(WeekDays)
 
-    OpeningTime()
-        : m_from(Day::Sunday)
-        , m_to(Day::Sunday)
-        , m_start()
-        , m_end()
-    { }
+    OpeningTime() = default;
 
-    OpeningTime(Day from, Day to, QTime start, QTime end)
-        : m_from(from)
-        , m_to(to)
+    OpeningTime(WeekDays days, const QString& weekDaysText, QTime start, QTime end)
+        : m_weekDays(days)
         , m_start(start)
         , m_end(end)
+        , m_weekDaysText(weekDaysText)
     { }
 
-    Day from() const { return m_from; }
-    Day to() const { return m_to; }
+    WeekDays weekDays() const { return m_weekDays; }
+    QString weekDaysText() const { return m_weekDaysText; }
     QTime start() const { return m_start; }
     QTime end() const { return m_end; }
-    bool isNull() const { return m_start.isNull() || m_end.isNull(); }
+    bool isNull() const { return m_weekDays == 0; }
 
 private:
-    Day m_from;
-    Day m_to;
+    WeekDays m_weekDays;
     QTime m_start;
     QTime m_end;
+    QString m_weekDaysText;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(OpeningTime::WeekDays)
 
 struct StationDetails {
     QString id;

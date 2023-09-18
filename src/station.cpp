@@ -64,9 +64,6 @@ void Station::update()
 
 float Station::priceFor(int fuel) const
 {
-    qCDebug(logger) << m_prices
-                    << fuel
-                    << static_cast<FuelPriceProvider::Fuel>(fuel);
     return m_prices.value(
                 static_cast<FuelPriceProvider::Fuel>(fuel),
                 std::numeric_limits<float>::quiet_NaN());
@@ -79,17 +76,21 @@ void Station::onSearchResults()
         return;
     }
 
-   StationDetails stations = reply->stationDetails();
+   const StationDetails stations = reply->stationDetails();
    m_name = stations.name;
    m_brand = stations.brand;
    m_address = stations.address;
    m_coordinate = stations.coordinate;
-   m_openingTimes = stations.openingTimes;
+   m_openingTimes.clear();
+   m_openingTimes.reserve(stations.openingTimes.size());
+   for (auto openingTime : stations.openingTimes) {
+       m_openingTimes.append(QVariant::fromValue(openingTime));
+   }
+
    m_openingTimesOverrides = stations.openingTimesOverrides;
    m_prices = stations.prices;
    m_isOpen = stations.isOpen;
    m_wholeDay = stations.wholeDay;
-   qCDebug(logger) << m_prices;
 
    setStatus(Status::Ready);
    emit detailsFetched();

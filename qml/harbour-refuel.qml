@@ -1,6 +1,7 @@
 import QtQuick 2.0
 import QtLocation 5.3
 import Sailfish.Silica 1.0
+import Nemo.Notifications 1.0
 import "pages"
 import "components"
 
@@ -12,6 +13,15 @@ ApplicationWindow {
     initialPage: Component { HomePage { } }
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
     allowedOrientations: defaultAllowedOrientations
+
+    Notification {
+        id: feedback
+
+        function info(text) {
+            feedback.previewSummary = text
+            feedback.show()
+        }
+    }
 
     FontLoader {
         id: dseg7
@@ -95,5 +105,9 @@ ApplicationWindow {
         }
 
         return res
+    }
+
+    function geoUri(coordinate) {
+        return "geo:" + coordinate.latitude + "," + coordinate.longitude
     }
 }
