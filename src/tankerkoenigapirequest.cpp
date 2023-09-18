@@ -19,6 +19,7 @@ static Q_LOGGING_CATEGORY(logger, "refuel.tankerkoenig");
 
 static const QUrl LIST_URL = QUrl(QStringLiteral("https://creativecommons.tankerkoenig.de/json/list.php"));
 static const QUrl DETAILS_URL = QUrl(QStringLiteral("https://creativecommons.tankerkoenig.de/json/detail.php"));
+static const QUrl PRICES_URL = QUrl(QStringLiteral("https://creativecommons.tankerkoenig.de/json/prices.php"));
 
 static const QString API_KEY = charSeqToQString(
             make_char_sequence<TankerKoenigApiKey>{});
@@ -223,6 +224,31 @@ StationDetailsReply *TankerKoenigProvider::stationForId(const QString &id)
     auto* reply = m_network.get(request);
 
     return new TankerKoenigStationDetailsReply(id, reply);
+}
+
+StationUpdatesReply *TankerKoenigProvider::pricesForStations(const QStringList &ids)
+{
+    QUrlQuery query;
+    query.addQueryItem(QStringLiteral("apikey"), m_apiKey);
+    query.addQueryItem(QStringLiteral("ids"), ids.join(','));
+
+    QUrl url = PRICES_URL;
+    url.setQuery(query);
+
+    QNetworkRequest request { url };
+    if (!m_userAgent.isEmpty()) {
+        request.setHeader(
+                    QNetworkRequest::KnownHeaders::UserAgentHeader,
+                    m_userAgent);
+    }
+    request.setRawHeader("Accept", "application/json;charset=utf-8");
+    request.setAttribute(QNetworkRequest::FollowRedirectsAttribute, true);
+
+    qCInfo(logger) << "Start prices request for" << ids;
+    qCDebug(logger) << "Request URL" << url;
+    auto* reply = m_network.get(request);
+
+    return new TankerKoenigStationUpdatesReply(ids, reply);
 }
 
 TankerKoenigStationDetailsReply::TankerKoenigStationDetailsReply(
@@ -445,6 +471,83 @@ void TankerKoenigStationDetailsReply::onNetworkReplyFinished()
 }
 
 void TankerKoenigStationDetailsReply::onNetworkReplyError()
+{
+    QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
+    reply->deleteLater();
+
+    setError(Error::CommunicationError, reply->errorString());
+}
+
+TankerKoenigStationUpdatesReply::TankerKoenigStationUpdatesReply(
+        const QStringList &stationIds, QNetworkReply *reply)
+    : StationUpdatesReply(stationIds)
+{
+    reply->setReadBufferSize(0);
+
+    connect(reply, &QNetworkReply::finished,
+            this, &TankerKoenigStationUpdatesReply::onNetworkReplyFinished);
+    connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error),
+            this, &TankerKoenigStationUpdatesReply::onNetworkReplyError);
+    connect(this, &QObject::destroyed, reply, &QObject::deleteLater);
+    connect(this, &FuelPriceReply::aborted, reply, &QNetworkReply::abort);
+}
+
+void TankerKoenigStationUpdatesReply::onNetworkReplyFinished()
+{
+    QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
+    reply->deleteLater();
+
+    if (reply->error() != QNetworkReply::NoError) {
+        return;
+    }
+
+    QJsonParseError error;
+    auto jsonDoc = QJsonDocument::fromJson(reply->readAll(), &error);
+    if (error.error != QJsonParseError::NoError) {
+        setError(Error::ParseError, QStringLiteral("Server error: invalid JSON"));
+        return;
+    }
+
+    auto root = jsonDoc.object();
+    bool ok = root.value(QStringLiteral("ok")).toBool(false);
+    if (!ok) {
+        auto message = root.value("message").toString("<missing>");
+        setError(Error::UnknownError, QStringLiteral("Server error: ") % message);
+        return;
+    }
+
+    const auto prices = root.value(QStringLiteral("prices")).toObject();
+    for (auto iter = prices.begin(); iter != prices.end(); ++iter) {
+        const auto id = iter.key();
+        const auto value = iter.value().toObject();
+        const auto status = value.value(QStringLiteral("status")).toString();
+        const auto e5 = value.value(QStringLiteral("e5"));
+        const auto e10 = value.value(QStringLiteral("e10"));
+        const auto diesel = value.value(QStringLiteral("diesel"));
+
+        QHash<FuelPriceProvider::Fuel, float> prices;
+        prices.reserve(3);
+        if (e5.isDouble()) {
+            prices.insert(FuelPriceProvider::Fuel::SuperE5, e5.toDouble());
+        }
+        if (e10.isDouble()) {
+            prices.insert(FuelPriceProvider::Fuel::SuperE10, e10.toDouble());
+        }
+        if (diesel.isDouble()) {
+            prices.insert(FuelPriceProvider::Fuel::Diesel, diesel.toDouble());
+        }
+
+        addStationUpdate(StationUpdate {
+                         .id = id,
+                         .prices = prices,
+                         .isOpen = status == QStringLiteral("open")
+                    });
+    }
+
+    setFinished();
+}
+
+void TankerKoenigStationUpdatesReply::onNetworkReplyError()
 {
     QNetworkReply* reply = qobject_cast<QNetworkReply*>(sender());
     reply->deleteLater();

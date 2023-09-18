@@ -102,7 +102,7 @@ Page {
 
                         Component.onCompleted: {
                             var fuel = fuelId
-                            station.detailsFetched.connect(function() {
+                            station.updated.connect(function() {
                                 priceItem.price = station.priceFor(fuel)
                             })
                         }
@@ -207,16 +207,17 @@ Page {
         }
 
         ViewPlaceholder {
-            enabled: station.status === Station.Error
-            text: station.errorString
+            enabled: station.detailsStatus === Station.Error
+            text: station.detailsErrorString
         }
 
         BusyLabel {
-            running: station.status === Station.Loading
+            running: station.detailsStatus === Station.Loading
         }
 
         PullDownMenu {
             flickable: content
+            busy: station.status === Station.Loading
 
             MenuItem {
                 text: qsTr("Update")

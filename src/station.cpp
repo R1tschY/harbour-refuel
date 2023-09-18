@@ -36,6 +36,17 @@ void Station::setError(const QString &errorString)
     }
 }
 
+void Station::setDetailsError(const QString &errorString)
+{
+    if (m_detailsErrorString != errorString) {
+        m_detailsErrorString = errorString;
+        emit detailsErrorStringChanged();
+        if (!m_detailsErrorString.isEmpty()) {
+            setDetailsStatus(Status::Error);
+        }
+    }
+}
+
 void Station::setStatus(Status status)
 {
     if (m_status != status) {
@@ -44,22 +55,26 @@ void Station::setStatus(Status status)
     }
 }
 
-void Station::fetchDetails()
+void Station::setDetailsStatus(Status status)
 {
-    if (m_provider && !m_id.isEmpty()) {
-        m_reply = m_provider->stationForId(m_id);
-        connect(m_reply, &StationDetailsReply::finished,
-                this, &Station::onSearchResults);
-        connect(m_reply, &StationDetailsReply::errorOccured,
-                this, &Station::onSearchError);
-        connect(m_reply, &QObject::destroyed, this, [this]() { m_reply = nullptr; });
-        m_status = Status::Loading;
+    if (m_detailsStatus != status) {
+        m_detailsStatus = status;
+        emit statusChanged();
     }
 }
 
-void Station::update()
+void Station::fetchDetails()
 {
-
+    if (m_provider && !m_id.isEmpty() && m_detailsStatus != Status::Loading) {
+        m_detailsReply = m_provider->stationForId(m_id);
+        connect(m_detailsReply, &StationDetailsReply::finished,
+                this, &Station::onSearchResults);
+        connect(m_detailsReply, &StationDetailsReply::errorOccured,
+                this, &Station::onSearchError);
+        connect(m_detailsReply, &QObject::destroyed, this, [this]() { m_detailsReply = nullptr; });
+        setDetailsStatus(Status::Loading);
+        setStatus(Status::Loading);
+    }
 }
 
 float Station::priceFor(int fuel) const
@@ -72,7 +87,7 @@ float Station::priceFor(int fuel) const
 void Station::onSearchResults()
 {
     auto* reply = static_cast<StationDetailsReply*>(sender());
-    if (reply != m_reply) {
+    if (reply != m_detailsReply) {
         return;
     }
 
@@ -93,17 +108,66 @@ void Station::onSearchResults()
    m_wholeDay = stations.wholeDay;
 
    setStatus(Status::Ready);
+   setDetailsStatus(Status::Ready);
    emit detailsFetched();
-   m_reply = nullptr;
+   emit updated();
+   m_detailsReply = nullptr;
 }
 
 void Station::onSearchError()
 {
     auto* reply = static_cast<StationDetailsReply*>(sender());
-    if (reply != m_reply) {
+    if (reply != m_detailsReply) {
+        return;
+    }
+
+    setDetailsError(reply->errorString());
+    m_detailsReply = nullptr;
+}
+
+void Station::update()
+{
+    if (m_provider && !m_id.isEmpty() && m_status != Status::Loading) {
+        m_updateReply = m_provider->pricesForStations({ m_id });
+        connect(m_updateReply, &StationUpdatesReply::finished,
+                this, &Station::onUpdateResults);
+        connect(m_updateReply, &StationUpdatesReply::errorOccured,
+                this, &Station::onUpdateError);
+        connect(m_updateReply, &QObject::destroyed, this, [this]() { m_updateReply = nullptr; });
+        setStatus(Status::Loading);
+    }
+}
+
+void Station::onUpdateResults()
+{
+    auto* reply = static_cast<StationUpdatesReply*>(sender());
+    if (reply != m_updateReply) {
+        return;
+    }
+
+   const QVector<StationUpdate> updates = reply->stationUpdates();
+   if (updates.size() != 1 || updates[0].id != m_id) {
+       setError(tr("Wrong update data received"));
+       m_updateReply = nullptr;
+       return;
+   }
+
+   const auto update = updates[0];
+   m_prices = update.prices;
+   m_isOpen = update.isOpen;
+
+   setStatus(Status::Ready);
+   emit updated();
+   m_updateReply = nullptr;
+}
+
+void Station::onUpdateError()
+{
+    auto* reply = static_cast<StationUpdatesReply*>(sender());
+    if (reply != m_updateReply) {
         return;
     }
 
     setError(reply->errorString());
-    m_reply = nullptr;
+    m_updateReply = nullptr;
 }

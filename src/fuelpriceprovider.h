@@ -12,6 +12,7 @@
 
 class FuelPriceReply;
 class StationDetailsReply;
+class StationUpdatesReply;
 
 class FuelPriceProvider : public QObject
 {
@@ -42,6 +43,9 @@ public:
 
     Q_INVOKABLE virtual StationDetailsReply* stationForId(
             const QString& id) = 0;
+
+    Q_INVOKABLE virtual StationUpdatesReply* pricesForStations(
+            const QStringList& ids) = 0;
 };
 
 inline int qHash(const FuelPriceProvider::Fuel& value, uint seed = 0) {
@@ -115,6 +119,12 @@ struct StationDetails {
     QHash<FuelPriceProvider::Fuel, float> prices;
     bool isOpen;
     bool wholeDay;
+};
+
+struct StationUpdate {
+    QString id;
+    QHash<FuelPriceProvider::Fuel, float> prices;
+    bool isOpen;
 };
 
 class Reply : public QObject {
@@ -202,5 +212,27 @@ private:
 
     void clear() override;
 };
+
+class StationUpdatesReply : public Reply {
+    Q_OBJECT
+public:
+    virtual ~StationUpdatesReply();
+
+    QStringList stationIds() const { return m_stationIds; }
+    QVector<StationUpdate> stationUpdates() const { return m_stationUpdates; }
+
+protected:
+    explicit StationUpdatesReply(const QStringList& stationIds);
+
+    void addStationUpdate(const StationUpdate& update);
+
+private:
+    QStringList m_stationIds;
+
+    QVector<StationUpdate> m_stationUpdates;
+
+    void clear() override;
+};
+
 
 #endif // REQUEST_H

@@ -76,3 +76,19 @@ void StationDetailsReply::clear()
 {
     m_stationDetails = StationDetails();
 }
+
+StationUpdatesReply::~StationUpdatesReply() = default;
+
+StationUpdatesReply::StationUpdatesReply(const QStringList &stationIds)
+    : m_stationIds(stationIds)
+{ }
+
+void StationUpdatesReply::addStationUpdate(const StationUpdate &update)
+{
+    m_stationUpdates.append(update);
+}
+
+void StationUpdatesReply::clear()
+{
+    m_stationUpdates.clear();
+}

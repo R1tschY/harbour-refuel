@@ -16,14 +16,16 @@ class Station : public QObject
     Q_PROPERTY(QString stationId READ stationId WRITE setStationId NOTIFY stationIdChanged)
     Q_PROPERTY(FuelPriceProvider* provider READ provider WRITE setProvider NOTIFY providerChanged)
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
+    Q_PROPERTY(Status detailsStatus READ detailsStatus NOTIFY detailsStatusChanged)
     Q_PROPERTY(QString errorString READ errorString NOTIFY errorStringChanged)
+    Q_PROPERTY(QString detailsErrorString READ detailsErrorString NOTIFY detailsErrorStringChanged)
     Q_PROPERTY(QString name READ name NOTIFY detailsFetched)
     Q_PROPERTY(QString brand READ brand NOTIFY detailsFetched)
     Q_PROPERTY(QGeoAddress address READ address NOTIFY detailsFetched)
     Q_PROPERTY(QGeoCoordinate coordinate READ coordinate NOTIFY detailsFetched)
     Q_PROPERTY(QVariantList openingTimes READ openingTimes NOTIFY detailsFetched)
     Q_PROPERTY(QStringList openingTimesOverrides READ openingTimesOverrides NOTIFY detailsFetched)
-    Q_PROPERTY(bool isOpen READ isOpen NOTIFY detailsFetched)
+    Q_PROPERTY(bool isOpen READ isOpen NOTIFY updated)
     Q_PROPERTY(bool wholeDay READ wholeDay NOTIFY detailsFetched)
 
 public:
@@ -47,7 +49,9 @@ public:
     bool wholeDay() const { return m_wholeDay; }
 
     Status status() const { return m_status; }
+    Status detailsStatus() const { return m_detailsStatus; }
     QString errorString() const { return m_errorString; }
+    QString detailsErrorString() const { return m_detailsErrorString; }
 
     QString stationId() const { return m_id; }
     void setStationId(const QString& value);
@@ -63,8 +67,11 @@ signals:
     void stationIdChanged();
     void providerChanged();
     void statusChanged();
+    void detailsStatusChanged();
     void errorStringChanged();
+    void detailsErrorStringChanged();
     void detailsFetched();
+    void updated();
 
 private:
     QString m_id;
@@ -79,14 +86,21 @@ private:
     bool m_wholeDay;
 
     FuelPriceProvider* m_provider = nullptr;
+    Status m_detailsStatus = Status::Null;
     Status m_status = Status::Null;
     QString m_errorString;
-    StationDetailsReply* m_reply = nullptr;
+    QString m_detailsErrorString;
+    StationDetailsReply* m_detailsReply = nullptr;
+    StationUpdatesReply* m_updateReply = nullptr;
 
     void setError(const QString &errorString);
+    void setDetailsError(const QString &errorString);
     void setStatus(Status status);
+    void setDetailsStatus(Status status);
     void onSearchResults();
     void onSearchError();
+    void onUpdateResults();
+    void onUpdateError();
 };
 
 #endif // STATION_H
