@@ -204,6 +204,10 @@ Page {
                     }
                 }
             }
+
+            FooterText {
+                text: provider.copyright
+            }
         }
 
         ViewPlaceholder {

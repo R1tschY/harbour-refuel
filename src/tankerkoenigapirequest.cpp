@@ -40,6 +40,12 @@ QGeoRectangle TankerKoenigProvider::boundingBox() const
                 QGeoCoordinate(55.099161, 15.0419309));
 }
 
+QString TankerKoenigProvider::copyright() const
+{
+    return tr("Licence: CC BY 4.0 - <a href=\"https://creativecommons.tankerkoenig.de\">Tankerkönig</a><br>"
+            "Data: MTS-K");
+}
+
 void TankerKoenigProvider::setUserAgent(const QString &value)
 {
     if (m_userAgent != value) {
@@ -171,11 +177,13 @@ void TankerKoenigPriceReply::onNetworkReplyFinished()
         address.setCity(place);
         address.setCountryCode(QStringLiteral("de"));
         address.setPostalCode(QString::number(postCode).rightJustified(5, '0'));
-        address.setStreet(street % QChar(' ') % houseNumber);
-        address.setText(street % QChar(' ') % houseNumber % QStringLiteral(", ")
-                        % address.postalCode()
-                        % QChar(' ') % place);
-
+        if (houseNumber.trimmed().isEmpty()) {
+            address.setStreet(street);
+        } else {
+            address.setStreet(street % QChar(' ') % houseNumber);
+        }
+        address.setText(address.street() % QStringLiteral(", ")
+                        % address.postalCode() % QChar(' ') % place);
 
         addStation(StationWithPrice {
                           .id = id,
@@ -277,24 +285,6 @@ enum WeekDayBit {
 };
 
 static std::optional<WeekDayBit> toDay(const QStringRef& text) {
-    if (text.size() == 2) {
-        if (text == QStringLiteral("Mo")) {
-            return WeekDayBit::Monday;
-        } else if (text == QStringLiteral("Di")) {
-            return WeekDayBit::Tuesday;
-        } else if (text == QStringLiteral("Mi")) {
-            return WeekDayBit::Wednesday;
-        } else if (text == QStringLiteral("Do")) {
-            return WeekDayBit::Thursday;
-        } else if (text == QStringLiteral("Fr")) {
-            return WeekDayBit::Friday;
-        } else if (text == QStringLiteral("Sa")) {
-            return WeekDayBit::Saturday;
-        } else if (text == QStringLiteral("So")) {
-            return WeekDayBit::Sunday;
-        }
-    }
-
     if (text == QStringLiteral("Montag")) {
         return WeekDayBit::Monday;
     } else if (text == QStringLiteral("Dienstag")) {
@@ -317,30 +307,12 @@ static std::optional<WeekDayBit> toDay(const QStringRef& text) {
 }
 
 static OpeningTime::WeekDays parseDays(const QString& text) {
-    if (text.contains(QChar('-'))) {
-        const auto fromTo = text.split(QChar('-'));
-        if (fromTo.size() != 2) {
-            return {};
-        }
-
-        const auto maybeFrom = toDay(&fromTo.at(0));
-        const auto maybeTo = toDay(&fromTo.at(1));
-        if (maybeFrom.has_value() && maybeTo.has_value()) {
-            int days = 0;
-            for (int i = maybeFrom.value(); i <= maybeTo.value(); i++) {
-                days |= 1 << i;
-            }
-            return static_cast<OpeningTime::WeekDays>(days);
-        } else {
-            return {};
-        }
+    if (text == QStringLiteral("Mo-Fr")) {
+        return { (1 << 5) - 1 };
+    } else if (text == QStringLiteral("täglich")) {
+        return { (1 << 8) - 1 };
     } else if (text == QStringLiteral("täglich ausser Sonn- und Feiertagen")) {
-        return OpeningTime::WeekDay::Monday
-                | OpeningTime::WeekDay::Tuesday
-                | OpeningTime::WeekDay::Wednesday
-                | OpeningTime::WeekDay::Thursday
-                | OpeningTime::WeekDay::Friday
-                | OpeningTime::WeekDay::Saturday;
+        return { (1 << 6) - 1 };
     } else {
         int days = 0;
         for (auto weekDayStr : text.splitRef(QStringLiteral(", "))) {
@@ -351,7 +323,7 @@ static OpeningTime::WeekDays parseDays(const QString& text) {
                 return {};
             }
         }
-        return static_cast<OpeningTime::WeekDays>(days);
+        return { days };
     }
 }
 
@@ -412,8 +384,12 @@ void TankerKoenigStationDetailsReply::onNetworkReplyFinished()
         const auto text = openingTime.value(QStringLiteral("text")).toString();
         const auto start = QTime::fromString(
                     openingTime.value(QStringLiteral("start")).toString());
-        const auto end = QTime::fromString(
+        auto end = QTime::fromString(
                     openingTime.value(QStringLiteral("end")).toString());
+
+        if (end == QTime(0, 0)) {
+            end = QTime(23, 59, 00);
+        }
 
         auto days = parseDays(text);
         if (days == OpeningTime::WeekDay::NoDays) {
@@ -448,10 +424,13 @@ void TankerKoenigStationDetailsReply::onNetworkReplyFinished()
     address.setCity(place);
     address.setCountryCode(QStringLiteral("de"));
     address.setPostalCode(QString::number(postCode).rightJustified(5, '0'));
-    address.setStreet(street % QChar(' ') % houseNumber);
-    address.setText(street % QChar(' ') % houseNumber % QStringLiteral(", ")
-                    % address.postalCode()
-                    % QChar(' ') % place);
+    if (houseNumber.trimmed().isEmpty()) {
+        address.setStreet(street);
+    } else {
+        address.setStreet(street % QChar(' ') % houseNumber);
+    }
+    address.setText(address.street() % QStringLiteral(", ")
+                    % address.postalCode() % QChar(' ') % place);
 
 
     setStationDetails(StationDetails {

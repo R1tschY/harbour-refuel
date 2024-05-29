@@ -23,6 +23,7 @@ public:
     explicit TankerKoenigProvider(QObject *parent = nullptr);
 
     QGeoRectangle boundingBox() const override;
+    QString copyright() const override;
 
     QString userAgent() const { return m_userAgent; }
     void setUserAgent(const QString& value);

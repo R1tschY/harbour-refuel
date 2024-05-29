@@ -90,6 +90,7 @@ add_custom_target(distfiles
         qml/components/LastSearchesModel.qml
         qml/components/DbConnection.qml
         qml/components/PriceDisplay.qml
+        qml/components/FooterText.qml
         rpm/harbour-refuel.spec
         README.md
         ${TsFiles})

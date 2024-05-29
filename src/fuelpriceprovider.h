@@ -18,6 +18,7 @@ class FuelPriceProvider : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QGeoRectangle boundingBox READ boundingBox CONSTANT)
+    Q_PROPERTY(QString copyright READ copyright CONSTANT)
 
 public:
     explicit FuelPriceProvider(QObject *parent = nullptr);
@@ -36,6 +37,7 @@ public:
     Q_ENUM(Sorting)
 
     virtual QGeoRectangle boundingBox() const = 0;
+    virtual QString copyright() const = 0;
 
     Q_INVOKABLE virtual FuelPriceReply* list(
             const QGeoCoordinate& coordinate, double radius,

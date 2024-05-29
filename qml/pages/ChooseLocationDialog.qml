@@ -1,6 +1,7 @@
-import QtQuick 2.0
+import QtQuick 2.6
 import QtLocation 5.3
 import Sailfish.Silica 1.0
+import "../components"
 
 import de.richardliebscher.refuel 0.1
 
@@ -40,6 +41,12 @@ Page {
             }
 
             Component.onCompleted: searchField.forceActiveFocus()
+        }
+
+        footer: FooterText {
+            text: qsTr("© <a href=\"https://www.openstreetmap.org/copyright\">OpenStreetMap</a> contributors")
+            visible: listView.count > 0
+                     && geocodeModel.status === GeocodeModel.Ready
         }
 
         model: GeocodeModel {

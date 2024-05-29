@@ -29,6 +29,12 @@ Page {
             title: qsTr("Stations")
         }
 
+        footer: FooterText {
+            text: provider.copyright
+            visible: listView.count > 0
+                     && listModel.status === StationListModel.Ready
+        }
+
         delegate: ListItem {
             id: delegate
 
