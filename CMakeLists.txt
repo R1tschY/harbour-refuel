@@ -3,8 +3,12 @@ project(harbour-refuel VERSION ${PACKAGE_VERSION} LANGUAGES CXX)
 
 find_package (Qt5 COMPONENTS Core Network Qml Gui Sql Quick Positioning Location REQUIRED)
 
+# pkg-config
 include(FindPkgConfig)
 pkg_search_module(SAILFISH sailfishapp REQUIRED)
+
+# cpm
+include(cmake/CPM.cmake)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_AUTOMOC ON)
@@ -81,6 +85,9 @@ add_custom_target(distfiles
         harbour-refuel.desktop
         qml/harbour-refuel.qml
         qml/cover/CoverPage.qml
+        qml/cover/FavsCover.qml
+        qml/cover/SearchResultsCover.qml
+        qml/cover/StationCover.qml
         qml/pages/StationListPage.qml
         qml/pages/SearchPage.qml
         qml/pages/HomePage.qml

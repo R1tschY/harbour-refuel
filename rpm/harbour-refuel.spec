@@ -33,12 +33,12 @@ Search for fuel station prices in Germany
 source %{_sourcedir}/../.env
 
 cmake \
+  -DCPM_SOURCE_CACHE=$PWD/.cpm-cache \
   -DCMAKE_INSTALL_PREFIX=/usr \
   -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
   -DPACKAGE_VERSION="%{version}" \
   -DPACKAGE_RELEASE="%{release}" \
-  -DTANKERKOENIG_APIKEY=$TANKERKOENIG_APIKEY \
-  -DSAILFISHOS=ON
+  -DTANKERKOENIG_APIKEY=$TANKERKOENIG_APIKEY
 cmake --build . -- %{?_smp_mflags}
 
 %install
