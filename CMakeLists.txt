@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5)
 project(harbour-refuel VERSION ${PACKAGE_VERSION} LANGUAGES CXX)
 
-find_package (Qt5 COMPONENTS Core Network Qml Gui Sql Quick Positioning Location REQUIRED)
+find_package(Qt5 COMPONENTS Core Network Qml Gui Sql Quick Positioning Location LinguistTools REQUIRED)
 
 # pkg-config
 include(FindPkgConfig)
@@ -21,20 +21,16 @@ endif()
 
 configure_file(src/config.h.in config.h @ONLY)
 
+file(GLOB TS_FILES CONFIGURE_DEPENDS "translations/*.ts")
+file(GLOB_RECURSE CXX_SOURCES CONFIGURE_DEPENDS src/*.cpp src/*.h)
+file(GLOB_RECURSE QML_SOURCES CONFIGURE_DEPENDS qml/*.qml)
+qt5_create_translation(
+    QM_FILES
+    ${CXX_SOURCES} ${QML_SOURCES}
+    ${TS_FILES})
+
 add_executable(harbour-refuel
-    src/qtployfill.h
-    src/char_sequence.h
-
-    src/osmimproved/photongeocoder.h src/osmimproved/photongeocoder.cpp
-    src/osmimproved/osmimprovedplugin.h src/osmimproved/osmimprovedplugin.cpp
-
-    src/models/sqlquerymodel.h src/models/sqlquerymodel.cpp
-
-    src/harbour-refuel.cpp
-    src/tankerkoenigapirequest.h src/tankerkoenigapirequest.cpp
-    src/fuelpriceprovider.h src/fuelpriceprovider.cpp
-    src/stationlistmodel.h src/stationlistmodel.cpp
-    src/station.h src/station.cpp
+    ${CXX_SOURCES} ${QML_SOURCES} ${QM_FILES}
 )
 target_compile_definitions(harbour-refuel PRIVATE
     $<$<OR:$<CONFIG:Debug>,$<CONFIG:RelWithDebInfo>>:QT_QML_DEBUG>
@@ -54,9 +50,8 @@ install(TARGETS harbour-refuel
 install(DIRECTORY qml
     DESTINATION share/harbour-refuel
 )
-install(DIRECTORY translations
-    DESTINATION share/harbour-refuel
-    FILES_MATCHING PATTERN "*.qm"
+install(FILES ${QM_FILES}
+    DESTINATION share/harbour-refuel/translations
 )
 install(FILES harbour-refuel.desktop
     DESTINATION share/applications
@@ -79,7 +74,6 @@ install(FILES fonts/DSEG7Modern-Regular.ttf
 )
 
 # Get the other files reachable from the project tree in Qt Creator
-FILE(GLOB TsFiles "translations/*.ts")
 add_custom_target(distfiles
     SOURCES
         harbour-refuel.desktop
@@ -100,7 +94,7 @@ add_custom_target(distfiles
         qml/components/FooterText.qml
         rpm/harbour-refuel.spec
         README.md
-        ${TsFiles})
+        ${TS_FILES})
 
 # Tell Qt Creator where the application executable(s) would be located on the
 # device.
