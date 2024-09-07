@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.14)
 project(harbour-refuel VERSION ${PACKAGE_VERSION} LANGUAGES CXX)
 
 find_package(Qt5 COMPONENTS Core Network Qml Gui Sql Quick Positioning Location LinguistTools REQUIRED)
@@ -9,6 +9,7 @@ pkg_search_module(SAILFISH sailfishapp REQUIRED)
 
 # cpm
 include(cmake/CPM.cmake)
+CPMAddPackage("gh:R1tschY/qommons#master")
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_AUTOMOC ON)

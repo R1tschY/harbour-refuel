@@ -15,8 +15,10 @@ BuildRequires:  pkgconfig(Qt5Quick)
 BuildRequires:  pkgconfig(Qt5Positioning)
 BuildRequires:  pkgconfig(Qt5Sql)
 BuildRequires:  pkgconfig(Qt5Location)
+BuildRequires:  pkgconfig(Qt5QuickTest)
 BuildRequires:  desktop-file-utils
-BuildRequires:  cmake
+BuildRequires:  cmake >= 3.14
+
 Requires: qt5-plugin-geoservices-osm
 Requires: qt5-qtdeclarative-import-location
 Requires: qt5-qtdeclarative-import-positioning
