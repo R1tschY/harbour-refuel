@@ -14,11 +14,11 @@ QtObject {
         db.transaction(function(tx) {
             tx.executeSql(
                 "INSERT INTO last_searches (
-                    timestamp, provider, name, latitude, longitude, fuel, distance)
+                    timestamp, provider, name, latitude, longitude, fuel_id, distance)
                  VALUES (
                     ?, ?, ?, ?, ?, ?, ?)
                  ON CONFLICT(
-                    provider, name, latitude, longitude, fuel)
+                    provider, name, latitude, longitude, fuel_id)
                  DO UPDATE SET
                     timestamp=excluded.timestamp, distance=excluded.distance",
                 [timestamp, provider, name,

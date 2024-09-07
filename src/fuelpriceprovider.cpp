@@ -2,9 +2,32 @@
 
 #include <QDebug>
 
+const QString FuelPriceProvider::GASOLINE_95_E5 = QString::fromLatin1("g95-e5");
+const QString FuelPriceProvider::GASOLINE_95_E10 = QString::fromLatin1("g95");
+const QString FuelPriceProvider::GASOLINE_98 = QString::fromLatin1("g98");
+const QString FuelPriceProvider::DIESEL = QString::fromLatin1("d");
+
 FuelPriceProvider::FuelPriceProvider(QObject *parent)
     : QObject(parent)
 { }
+
+QString FuelPriceProvider::fuelName(const QString &fuelId)
+{
+    if (fuelId == GASOLINE_95_E5) {
+        //: Gasoline with 95 RON and 5 percent ethanol
+        return tr("Unleaded E5");
+    } else if (fuelId == GASOLINE_95_E10) {
+        //: Gasoline with 95 RON and 10 percent ethanol
+        return tr("Unleaded E10");
+    } else if (fuelId == GASOLINE_98) {
+        //: Gasoline with 98 RON
+        return tr("Unleaded Premium");
+    } else if (fuelId == DIESEL) {
+        return tr("Diesel");
+    } else {
+        return QStringLiteral("Unknown: ") + fuelId;
+    }
+}
 
 void Reply::abort()
 {
@@ -35,10 +58,10 @@ void Reply::setFinished()
     emit finished();
 }
 
-FuelPriceReply::FuelPriceReply(const QGeoCoordinate &coordinate, double radius, FuelPriceProvider::Fuel fuel, FuelPriceProvider::Sorting sorting)
+FuelPriceReply::FuelPriceReply(const QGeoCoordinate &coordinate, double radius, const QString& fuelId, FuelPriceProvider::Sorting sorting)
     : m_coordinate(coordinate)
     , m_radius(radius)
-    , m_fuel(fuel)
+    , m_fuelId(fuelId)
     , m_sorting(sorting)
 { }
 

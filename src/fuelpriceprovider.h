@@ -19,16 +19,15 @@ class FuelPriceProvider : public QObject
     Q_OBJECT
     Q_PROPERTY(QGeoRectangle boundingBox READ boundingBox CONSTANT)
     Q_PROPERTY(QString copyright READ copyright CONSTANT)
+    Q_PROPERTY(QStringList fuels READ fuels CONSTANT)
 
 public:
     explicit FuelPriceProvider(QObject *parent = nullptr);
 
-    enum class Fuel {
-        SuperE5,
-        SuperE10,
-        Diesel
-    };
-    Q_ENUM(Fuel)
+    static const QString GASOLINE_95_E5;
+    static const QString GASOLINE_95_E10;
+    static const QString GASOLINE_98;
+    static const QString DIESEL;
 
     enum class Sorting {
         Price,
@@ -38,21 +37,20 @@ public:
 
     virtual QGeoRectangle boundingBox() const = 0;
     virtual QString copyright() const = 0;
+    virtual QStringList fuels() const = 0;
 
     Q_INVOKABLE virtual FuelPriceReply* list(
             const QGeoCoordinate& coordinate, double radius,
-            Fuel fuel, Sorting sorting) = 0;
+            const QString& fuelId, Sorting sorting) = 0;
 
     Q_INVOKABLE virtual StationDetailsReply* stationForId(
             const QString& id) = 0;
 
     Q_INVOKABLE virtual StationUpdatesReply* pricesForStations(
             const QStringList& ids) = 0;
-};
 
-inline int qHash(const FuelPriceProvider::Fuel& value, uint seed = 0) {
-    return qHash(static_cast<int>(value), seed);
-}
+    Q_INVOKABLE virtual QString fuelName(const QString& fuelId);
+};
 
 struct StationWithPrice {
     QString id;
@@ -118,14 +116,14 @@ struct StationDetails {
     QGeoCoordinate coordinate;
     QVector<OpeningTime> openingTimes;
     QStringList openingTimesOverrides;
-    QHash<FuelPriceProvider::Fuel, float> prices;
+    QHash<QString, float> prices;
     bool isOpen;
     bool wholeDay;
 };
 
 struct StationUpdate {
     QString id;
-    QHash<FuelPriceProvider::Fuel, float> prices;
+    QHash<QString, float> prices;
     bool isOpen;
 };
 
@@ -171,14 +169,13 @@ public:
 
     QGeoCoordinate coordinate() const { return m_coordinate; }
     double radius() const { return m_radius; }
-    FuelPriceProvider::Fuel fuel() const { return m_fuel; }
+    QString fuelId() const { return m_fuelId; }
     FuelPriceProvider::Sorting sorting() const { return m_sorting; }
     QVector<StationWithPrice> stations() const { return m_stations; }
 
 protected:
-    explicit FuelPriceReply(
-            const QGeoCoordinate& coordinate, double radius,
-            FuelPriceProvider::Fuel fuel, FuelPriceProvider::Sorting sorting);
+    explicit FuelPriceReply(const QGeoCoordinate& coordinate, double radius,
+            const QString &fuelId, FuelPriceProvider::Sorting sorting);
 
     void addStation(const StationWithPrice &location);
     void setStations(const QVector<StationWithPrice> &stations);  
@@ -186,7 +183,7 @@ protected:
 private:
     QGeoCoordinate m_coordinate;
     double m_radius;
-    FuelPriceProvider::Fuel m_fuel;
+    QString m_fuelId;
     FuelPriceProvider::Sorting m_sorting;
 
     QVector<StationWithPrice> m_stations;

@@ -48,20 +48,7 @@ Page {
                     width: page.width
                     visible: station.isOpen
 
-                    model: ListModel {
-                        ListElement {
-                          name: qsTr("Super E5")
-                          fuelId: FuelPriceProvider.SuperE5
-                        }
-                        ListElement {
-                          name: qsTr("Super E10")
-                          fuelId: FuelPriceProvider.SuperE10
-                        }
-                        ListElement {
-                          name: qsTr("Diesel")
-                          fuelId: FuelPriceProvider.Diesel
-                        }
-                    }
+                    model: provider.fuels
 
                     delegate: Item {
                         id: priceItem
@@ -94,14 +81,14 @@ Page {
                                 verticalCenter: priceLabel.verticalCenter
                             }
 
-                            text: name
+                            text: provider.fuelName(modelData)
                             color: Theme.highlightColor
                         }
 
                         visible: !isNaN(price)
 
                         Component.onCompleted: {
-                            var fuel = fuelId
+                            var fuel = modelData
                             station.updated.connect(function() {
                                 priceItem.price = station.priceFor(fuel)
                             })

@@ -46,6 +46,11 @@ QString TankerKoenigProvider::copyright() const
             "Data: MTS-K");
 }
 
+QStringList TankerKoenigProvider::fuels() const
+{
+    return { GASOLINE_95_E10, GASOLINE_95_E5, DIESEL };
+}
+
 void TankerKoenigProvider::setUserAgent(const QString &value)
 {
     if (m_userAgent != value) {
@@ -54,7 +59,7 @@ void TankerKoenigProvider::setUserAgent(const QString &value)
     }
 }
 
-FuelPriceReply *TankerKoenigProvider::list(const QGeoCoordinate &coordinate, double radius, Fuel fuel,
+FuelPriceReply *TankerKoenigProvider::list(const QGeoCoordinate &coordinate, double radius, const QString &fuelId,
         Sorting sorting)
 {
     QUrlQuery query;
@@ -64,16 +69,15 @@ FuelPriceReply *TankerKoenigProvider::list(const QGeoCoordinate &coordinate, dou
     query.addQueryItem(QStringLiteral("rad"), QString::number(radius));
 
     QString fuelStr;
-    switch (fuel) {
-    case FuelPriceProvider::Fuel::SuperE5:
+    if (fuelId == FuelPriceProvider::GASOLINE_95_E5) {
         fuelStr = QStringLiteral("e5");
-        break;
-    case FuelPriceProvider::Fuel::SuperE10:
+    } else if (fuelId == FuelPriceProvider::GASOLINE_95_E10) {
         fuelStr = QStringLiteral("e10");
-        break;
-    case FuelPriceProvider::Fuel::Diesel:
+    } else if (fuelId == FuelPriceProvider::DIESEL) {
         fuelStr = QStringLiteral("diesel");
-        break;
+    } else {
+        qWarning() << "Unsupported fuel ID" << fuelId;
+        fuelStr = QStringLiteral("e10");
     }
     query.addQueryItem(QStringLiteral("type"), fuelStr);
 
@@ -106,14 +110,13 @@ FuelPriceReply *TankerKoenigProvider::list(const QGeoCoordinate &coordinate, dou
 
 
     return new TankerKoenigPriceReply(
-                coordinate, radius, fuel, sorting, reply);
+                coordinate, radius, fuelId, sorting, reply);
 }
 
-TankerKoenigPriceReply::TankerKoenigPriceReply(
-        const QGeoCoordinate& coordinate, double radius,
-        FuelPriceProvider::Fuel fuel, FuelPriceProvider::Sorting sorting,
+TankerKoenigPriceReply::TankerKoenigPriceReply(const QGeoCoordinate& coordinate, double radius,
+        const QString &fuelId, FuelPriceProvider::Sorting sorting,
         QNetworkReply *reply)
-    : FuelPriceReply(coordinate, radius, fuel, sorting)
+    : FuelPriceReply(coordinate, radius, fuelId, sorting)
 {
     reply->setReadBufferSize(0);
 
@@ -408,16 +411,16 @@ void TankerKoenigStationDetailsReply::onNetworkReplyFinished()
         overridesList.push_back(entry.toString());
     }
 
-    QHash<FuelPriceProvider::Fuel, float> prices;
+    QHash<QString, float> prices;
     prices.reserve(3);
     if (e5.isDouble()) {
-        prices.insert(FuelPriceProvider::Fuel::SuperE5, e5.toDouble());
+        prices.insert(FuelPriceProvider::GASOLINE_95_E5, e5.toDouble());
     }
     if (e10.isDouble()) {
-        prices.insert(FuelPriceProvider::Fuel::SuperE10, e10.toDouble());
+        prices.insert(FuelPriceProvider::GASOLINE_95_E10, e10.toDouble());
     }
     if (diesel.isDouble()) {
-        prices.insert(FuelPriceProvider::Fuel::Diesel, diesel.toDouble());
+        prices.insert(FuelPriceProvider::DIESEL, diesel.toDouble());
     }
 
     QGeoAddress address;
@@ -504,16 +507,16 @@ void TankerKoenigStationUpdatesReply::onNetworkReplyFinished()
         const auto e10 = value.value(QStringLiteral("e10"));
         const auto diesel = value.value(QStringLiteral("diesel"));
 
-        QHash<FuelPriceProvider::Fuel, float> prices;
+        QHash<QString, float> prices;
         prices.reserve(3);
         if (e5.isDouble()) {
-            prices.insert(FuelPriceProvider::Fuel::SuperE5, e5.toDouble());
+            prices.insert(FuelPriceProvider::GASOLINE_95_E5, e5.toDouble());
         }
         if (e10.isDouble()) {
-            prices.insert(FuelPriceProvider::Fuel::SuperE10, e10.toDouble());
+            prices.insert(FuelPriceProvider::GASOLINE_95_E10, e10.toDouble());
         }
         if (diesel.isDouble()) {
-            prices.insert(FuelPriceProvider::Fuel::Diesel, diesel.toDouble());
+            prices.insert(FuelPriceProvider::DIESEL, diesel.toDouble());
         }
 
         addStationUpdate(StationUpdate {

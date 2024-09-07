@@ -10,7 +10,7 @@ Page {
 
     property variant coordinate
     property real radius
-    property int fuel
+    property string fuelId
 
     allowedOrientations: Orientation.All
 
@@ -147,7 +147,7 @@ Page {
     }
 
     function _update() {
-        listModel.search(coordinate, radius, fuel)
+        listModel.search(coordinate, radius, fuelId)
     }
 
     Component.onCompleted: _update()

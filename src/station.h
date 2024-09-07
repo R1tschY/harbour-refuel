@@ -61,7 +61,7 @@ public:
 
     Q_INVOKABLE void fetchDetails();
     Q_INVOKABLE void update();
-    Q_INVOKABLE float priceFor(int) const;
+    Q_INVOKABLE float priceFor(const QString& fuelId) const;
 
 signals:
     void stationIdChanged();
@@ -81,7 +81,7 @@ private:
     QGeoCoordinate m_coordinate;
     QVariantList m_openingTimes;
     QStringList m_openingTimesOverrides;
-    QHash<FuelPriceProvider::Fuel, float> m_prices;
+    QHash<QString, float> m_prices;
     bool m_isOpen;
     bool m_wholeDay;
 

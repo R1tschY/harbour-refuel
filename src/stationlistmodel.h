@@ -47,8 +47,7 @@ public:
 
     QHash<int, QByteArray> roleNames() const override;
 
-    Q_INVOKABLE void search(
-            const QGeoCoordinate& coordinate, float radius, int fuel);
+    Q_INVOKABLE void search(const QGeoCoordinate& coordinate, float radius, const QString& fuelId);
     Q_INVOKABLE void reset();
 
 signals:

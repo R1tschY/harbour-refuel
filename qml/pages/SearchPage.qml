@@ -81,16 +81,12 @@ Dialog {
                 label: qsTr("Fuel type")
                 menu: ContextMenu {
                     Repeater {
-                        model: [
-                            FuelPriceProvider.SuperE5,
-                            FuelPriceProvider.SuperE10,
-                            FuelPriceProvider.Diesel
-                        ]
+                        model: provider.fuels
 
                         MenuItem {
-                            readonly property int fuel: modelData
+                            readonly property string fuelId: modelData
 
-                            text: formatFuel(fuel)
+                            text: provider.fuelName(modelData)
                         }
                     }
                 }
@@ -123,7 +119,7 @@ Dialog {
     }
 
     onAccepted: {
-        var fuel = fuelTypeChooser.currentItem.fuel
+        var fuel = fuelTypeChooser.currentItem.fuelId
         var radius = radiusChooser.currentItem.radius
         var coordinate = locationChooser.coordinate
         var name = locationChooser.value
@@ -131,7 +127,7 @@ Dialog {
 
         pageStack.push(
                     Qt.resolvedUrl("StationListPage.qml"),
-                    { fuel: fuel, radius: radius, coordinate: coordinate })
+                    { fuelId: fuel, radius: radius, coordinate: coordinate })
 
         lastSearchesModel.add(
                     Date.now(),

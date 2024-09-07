@@ -48,7 +48,7 @@ Page {
                     localStorageName: database.dataBaseId
 
                     Component.onCompleted: {
-                        exec("SELECT rowid, name, fuel, latitude, longitude, distance
+                        exec("SELECT rowid, name, fuel_id as fuelId, latitude, longitude, distance
                               FROM last_searches
                               ORDER BY timestamp DESC")
                     }
@@ -92,7 +92,7 @@ Page {
 
                     Label {
                         id: detailsLabel
-                        text: formatFuel(fuel) + " | " + distance + " km"
+                        text: provider.fuelName(fuelId) + " | " + distance + " km"
 
                         anchors {
                             right: parent.right
@@ -109,14 +109,14 @@ Page {
 
                         pageStack.push(
                                     Qt.resolvedUrl("StationListPage.qml"),
-                                    { fuel: fuel, radius: distance, coordinate: coord })
+                                    { fuelId: fuelId, radius: distance, coordinate: coord })
 
                         lastSearchesModel.add(
                                     Date.now(),
                                     "tankerkoenig",
                                     name,
                                     coord,
-                                    fuel,
+                                    fuelId,
                                     distance)
                     }
                 }

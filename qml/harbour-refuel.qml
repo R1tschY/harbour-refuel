@@ -68,19 +68,6 @@ ApplicationWindow {
         return [str.slice(0, -1), str.slice(-1)]
     }
 
-    function formatFuel(fuel) {
-        switch (fuel) {
-        case FuelPriceProvider.SuperE5:
-            return qsTr("Super E5")
-        case FuelPriceProvider.SuperE10:
-            return qsTr("Super E10")
-        case FuelPriceProvider.Diesel:
-            return qsTr("Diesel")
-        default:
-            return "<Unknown Fuel>"
-        }
-    }
-
     function formatAddress(address) {
         var res = ""
         // TODO: check country code

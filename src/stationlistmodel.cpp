@@ -91,7 +91,7 @@ QHash<int, QByteArray> StationListModel::roleNames() const
 }
 
 void StationListModel::search(
-        const QGeoCoordinate& coordinate, float radius, int fuel)
+        const QGeoCoordinate& coordinate, float radius, const QString& fuelId)
 {
     if (!m_provider) {
         return;
@@ -110,8 +110,7 @@ void StationListModel::search(
     setError({});
 
     m_reply = m_provider->list(
-                coordinate, radius, (FuelPriceProvider::Fuel) fuel,
-                FuelPriceProvider::Sorting::Price);
+                coordinate, radius, fuelId, FuelPriceProvider::Sorting::Price);
     connect(m_reply, &TankerKoenigPriceReply::finished,
             this, &StationListModel::onSearchResults);
     connect(m_reply, &TankerKoenigPriceReply::errorOccured,

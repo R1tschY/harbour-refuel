@@ -24,13 +24,14 @@ public:
 
     QGeoRectangle boundingBox() const override;
     QString copyright() const override;
+    QStringList fuels() const override;
 
     QString userAgent() const { return m_userAgent; }
     void setUserAgent(const QString& value);
 
     FuelPriceReply* list(
             const QGeoCoordinate& coordinate, double radius,
-            FuelPriceProvider::Fuel spirit, FuelPriceProvider::Sorting sorting
+            const QString& fuelId, FuelPriceProvider::Sorting sorting
             ) override;
 
     StationDetailsReply *stationForId(const QString &id) override;
@@ -53,7 +54,7 @@ class TankerKoenigPriceReply : public FuelPriceReply
 public:
     explicit TankerKoenigPriceReply(
             const QGeoCoordinate& coordinate, double radius,
-            FuelPriceProvider::Fuel fuel, FuelPriceProvider::Sorting sorting,
+            const QString& fuelId, FuelPriceProvider::Sorting sorting,
             QNetworkReply* reply);
 
 private:

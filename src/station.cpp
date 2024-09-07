@@ -2,8 +2,6 @@
 
 #include <QLoggingCategory>
 
-static Q_LOGGING_CATEGORY(logger, "refuel.station");
-
 Station::Station(QObject *parent) : QObject(parent)
 {
 
@@ -77,11 +75,9 @@ void Station::fetchDetails()
     }
 }
 
-float Station::priceFor(int fuel) const
+float Station::priceFor(const QString& fuelId) const
 {
-    return m_prices.value(
-                static_cast<FuelPriceProvider::Fuel>(fuel),
-                std::numeric_limits<float>::quiet_NaN());
+    return m_prices.value(fuelId, std::numeric_limits<float>::quiet_NaN());
 }
 
 void Station::onSearchResults()
