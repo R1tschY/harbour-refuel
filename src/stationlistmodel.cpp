@@ -84,6 +84,7 @@ QHash<int, QByteArray> StationListModel::roleNames() const
     roleNames.insert(BrandRole, "brand");
     roleNames.insert(AddressRole, "address");
     roleNames.insert(CoordinateRole, "coordinate");
+    roleNames.insert(CoordinateRole, "coord");
     roleNames.insert(DistanceRole, "distance");
     roleNames.insert(IsOpenRole, "isOpen");
     roleNames.insert(PriceRole, "price");
@@ -137,6 +138,13 @@ void StationListModel::onSearchResults()
 
     beginResetModel();
     m_stations = reply->stations();
+
+    auto lowestPriceStation = std::min_element(m_stations.cbegin(), m_stations.cend(), [](const StationWithPrice& a, const StationWithPrice& b) {
+       return a.price < b.price;
+    });
+    m_lowestPrice = lowestPriceStation != m_stations.cend()
+            ? lowestPriceStation->price : -1;
+
     endResetModel();
 
     setStatus(Status::Ready);

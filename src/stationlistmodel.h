@@ -12,6 +12,7 @@ class StationListModel : public QAbstractListModel
     Q_PROPERTY(FuelPriceProvider* provider READ provider WRITE setProvider NOTIFY providerChanged)
     Q_PROPERTY(Status status READ status NOTIFY statusChanged)
     Q_PROPERTY(QString errorString READ errorString NOTIFY errorStringChanged)
+    Q_PROPERTY(double lowestPrice READ lowestPrice NOTIFY lowestPriceChanged)
 
 public:
     explicit StationListModel(QObject *parent = nullptr);
@@ -38,6 +39,8 @@ public:
     Status status() const { return m_status; }
     QString errorString() const { return m_errorString; }
 
+    double lowestPrice() const { return m_lowestPrice; }
+
     FuelPriceProvider* provider() const { return m_provider; }
     void setProvider(FuelPriceProvider* provider);
 
@@ -54,6 +57,7 @@ signals:
     void errorStringChanged();
     void statusChanged();
     void providerChanged();
+    void lowestPriceChanged();
 
 private:
     QVector<StationWithPrice> m_stations;
@@ -61,6 +65,7 @@ private:
     QString m_errorString;
     FuelPriceReply* m_reply = nullptr;
     Status m_status = Status::Null;
+    double m_lowestPrice = -1;
 
     void onSearchResults();
     void onSearchError();
