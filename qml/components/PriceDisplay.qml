@@ -21,7 +21,7 @@ Label {
 
         text: "8.88"
 
-        font.pixelSize: Theme.fontSizeLarge
+        font.pixelSize: root.font.pixelSize
         font.family: dseg7.name
         color: root.placeholderColor
         opacity: 0.30
@@ -35,7 +35,7 @@ Label {
 
         anchors.left: pricePlaceholder.right
 
-        font.pixelSize: Theme.fontSizeSmall
+        font.pixelSize: root.font.pixelSize * 0.7
         font.family: dseg7.name
         color: root.placeholderColor
         opacity: 0.30
@@ -46,7 +46,7 @@ Label {
 
         anchors.left: pricePlaceholder.right
 
-        font.pixelSize: Theme.fontSizeSmall
+        font.pixelSize: root.font.pixelSize * 0.7
         font.family: dseg7.name
         color: root.color
     }

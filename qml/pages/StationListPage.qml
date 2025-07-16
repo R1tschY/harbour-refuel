@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtLocation 5.4
 import Sailfish.Silica 1.0
 
 import de.richardliebscher.refuel 0.1
@@ -13,6 +14,8 @@ BasePage {
     property variant coordinate
     property real radius
     property string fuelId
+    property string name
+    property alias model: listModel
 
     allowedOrientations: Orientation.All
 
@@ -44,10 +47,10 @@ BasePage {
 
             property var priceParts: formatPrice(price)
 
-            property var primaryColor: delegate.highlighted
+            property color primaryColor: delegate.highlighted
                                        ? Theme.highlightColor
                                        : Theme.primaryColor
-            property var secondaryColor: delegate.highlighted
+            property color secondaryColor: delegate.highlighted
                                          ? Theme.secondaryHighlightColor
                                          : Theme.secondaryColor
 
@@ -153,4 +156,12 @@ BasePage {
     }
 
     Component.onCompleted: _update()
+
+    onStatusChanged: {
+        if (status === PageStatus.Active) {
+            pageStack.pushAttached(
+                        Qt.resolvedUrl("StationsMapPage.qml"),
+                        {position: coordinate, model: listModel, radius: radius})
+        }
+    }
 }

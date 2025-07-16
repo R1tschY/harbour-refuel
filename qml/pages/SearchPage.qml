@@ -127,12 +127,12 @@ Dialog {
 
         pageStack.push(
                     Qt.resolvedUrl("StationListPage.qml"),
-                    { fuelId: fuel, radius: radius, coordinate: coordinate })
+                    { fuelId: fuel, radius: radius, coordinate: coordinate, name: name })
 
         lastSearchesModel.add(
                     Date.now(),
                     "tankerkoenig",
-                    locationChooser.value,
+                    name,
                     currentPos ? QtPositioning.coordinate() : coordinate,
                     fuel,
                     radius)
