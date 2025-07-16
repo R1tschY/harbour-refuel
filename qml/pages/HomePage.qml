@@ -5,10 +5,10 @@ import Sailfish.Silica 1.0
 import de.richardliebscher.refuel 0.1
 
 
-Page {
+BasePage {
     id: page
 
-    allowedOrientations: Orientation.All
+    coverView: Qt.resolvedUrl("../cover/FavsCover.qml")
 
     SilicaFlickable {
         id: content
@@ -24,7 +24,7 @@ Page {
             }
 
             SectionHeader {
-                text: qsTr("Favioutes")
+                text: qsTr("Favorites")
                 visible: favs.count > 0
             }
 
@@ -109,7 +109,7 @@ Page {
 
                         pageStack.push(
                                     Qt.resolvedUrl("StationListPage.qml"),
-                                    { fuelId: fuelId, radius: distance, coordinate: coord })
+                                    { fuelId: fuelId, radius: distance, coordinate: coord, name: name })
 
                         lastSearchesModel.add(
                                     Date.now(),

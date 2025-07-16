@@ -5,8 +5,10 @@ import de.richardliebscher.refuel 0.1
 import "../components"
 
 
-Page {
+BasePage {
     id: page
+
+    coverView: Qt.resolvedUrl("../cover/SearchResultsCover.qml")
 
     property variant coordinate
     property real radius

@@ -14,6 +14,8 @@ ApplicationWindow {
     cover: Qt.resolvedUrl("cover/CoverPage.qml")
     allowedOrientations: defaultAllowedOrientations
 
+    property Page coverViewPage
+
     Notification {
         id: feedback
 
@@ -57,6 +59,21 @@ ApplicationWindow {
     LastSearchesModel {
         id: lastSearchesModel
         db: database
+    }
+
+    Connections {
+        target: pageStack
+
+        onCurrentPageChanged: {
+            var page = pageStack.find(function(page) { return !!page.coverView })
+            if (page) {
+                app.cover = page.coverView
+                app.coverViewPage = page
+            } else {
+                app.cover = Qt.resolvedUrl("cover/FavsCover.qml")
+                app.coverViewPage = null
+            }
+        }
     }
 
     function formatPrice(price) {

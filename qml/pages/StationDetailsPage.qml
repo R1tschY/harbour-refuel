@@ -5,12 +5,12 @@ import Sailfish.Silica 1.0
 import de.richardliebscher.refuel 0.1
 import "../components"
 
-Page {
+BasePage {
     id: page
 
     property string stationId
 
-    allowedOrientations: Orientation.All
+    coverView: Qt.resolvedUrl("../cover/StationCover.qml")
 
     Station {
         id: station
@@ -222,6 +222,13 @@ Page {
     Component.onCompleted: {
         station.provider = provider
         station.fetchDetails()
+    }
+
+    onStatusChanged: {
+        if (status === PageStatus.Active) {
+            app.coverType = "station"
+            app.coverStation = station
+        }
     }
 
     function formatWeekDays(weekDays) {
