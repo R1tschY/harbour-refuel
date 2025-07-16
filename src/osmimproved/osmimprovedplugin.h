@@ -13,4 +13,6 @@ public:
     OsmImprovedPlugin();
 
     QGeoCodingManagerEngine *createGeocodingManagerEngine(const QVariantMap &parameters, QGeoServiceProvider::Error *error, QString *errorString) const override;
+
+    QGeoMappingManagerEngine *createMappingManagerEngine(const QVariantMap &parameters, QGeoServiceProvider::Error *error, QString *errorString) const override;
 };

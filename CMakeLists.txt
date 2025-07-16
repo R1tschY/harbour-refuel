@@ -39,6 +39,7 @@ target_compile_definitions(harbour-refuel PRIVATE
 )
 target_include_directories(harbour-refuel PRIVATE
     $<BUILD_INTERFACE: ${SAILFISH_INCLUDE_DIRS} >
+    ${Qt5Location_PRIVATE_INCLUDE_DIRS}
     "${CMAKE_CURRENT_BINARY_DIR}")
 target_link_libraries(harbour-refuel
     Qt5::Quick Qt5::Sql Qt5::Positioning Qt5::Location

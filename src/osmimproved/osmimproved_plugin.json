@@ -5,6 +5,7 @@
     "Experimental": false,
     "Features": [
         "OnlineGeocodingFeature",
-        "ReverseGeocodingFeature"
+        "ReverseGeocodingFeature",
+        "OnlineMappingFeature"
     ]
 }
