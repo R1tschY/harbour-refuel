@@ -41,6 +41,39 @@ static const QUrl PRICES_URL = QUrl(QStringLiteral("https://creativecommons.tank
 static const QString API_KEY = charSeqToQString(
             make_char_sequence<TankerKoenigApiKey>{});
 
+static QString capitalizeEachWord(const QString& input) {
+    QString result = input.toLower();
+    bool newWord = true;
+    for (int i = 0; i < result.length(); ++i) {
+        QChar c = result[i];
+        if (c.isSpace() || c.isPunct()) {
+            newWord = true;
+        } else if (newWord) {
+            if (!c.isUpper()) {
+                result[i] = c.toUpper();
+            }
+            newWord = false;
+        }
+    }
+    return result;
+}
+
+static QGeoAddress createAddress(const QString& street, const QString& houseNumber, int postCode, const QString& place) {
+    QGeoAddress address;
+    QString place_ = capitalizeEachWord(place);
+
+    address.setCity(capitalizeEachWord(place_));
+    address.setCountryCode(QStringLiteral("de"));
+    address.setPostalCode(QString::number(postCode).rightJustified(5, '0'));
+    if (houseNumber.trimmed().isEmpty()) {
+        address.setStreet(capitalizeEachWord(street));
+    } else {
+        address.setStreet(capitalizeEachWord(street) % QChar(' ') % houseNumber);
+    }
+    address.setText(address.street() % QStringLiteral(", ") % address.postalCode() % QChar(' ') % place_);
+    return address;
+}
+
 TankerKoenigProvider::TankerKoenigProvider(QObject *parent)
     : FuelPriceProvider(parent)
     , m_network()
@@ -193,17 +226,7 @@ void TankerKoenigPriceReply::onNetworkReplyFinished()
         auto isOpen = stationObject.value(QStringLiteral("isOpen")).toBool();
         float price = stationObject.value(QStringLiteral("price")).toDouble();
 
-        QGeoAddress address;
-        address.setCity(place);
-        address.setCountryCode(QStringLiteral("de"));
-        address.setPostalCode(QString::number(postCode).rightJustified(5, '0'));
-        if (houseNumber.trimmed().isEmpty()) {
-            address.setStreet(street);
-        } else {
-            address.setStreet(street % QChar(' ') % houseNumber);
-        }
-        address.setText(address.street() % QStringLiteral(", ")
-                        % address.postalCode() % QChar(' ') % place);
+        QGeoAddress address = createAddress(street, houseNumber, postCode, place);
 
         addStation(StationWithPrice {
                           .id = id,
@@ -383,7 +406,7 @@ void TankerKoenigStationDetailsReply::onNetworkReplyFinished()
     const auto id = station.value(QStringLiteral("id")).toString();
     const auto name = station.value(QStringLiteral("name")).toString();
     const auto brand = station.value(QStringLiteral("brand")).toString();
-    const auto street = station.value(QStringLiteral("street")).toString();
+    const auto street = capitalizeEachWord(station.value(QStringLiteral("street")).toString());
     const auto houseNumber = station.value(QStringLiteral("houseNumber")).toString();
     const auto postCode = station.value(QStringLiteral("postCode")).toInt();
     const auto place = station.value(QStringLiteral("place")).toString();
@@ -440,18 +463,7 @@ void TankerKoenigStationDetailsReply::onNetworkReplyFinished()
         prices.insert(FuelPriceProvider::DIESEL, diesel.toDouble());
     }
 
-    QGeoAddress address;
-    address.setCity(place);
-    address.setCountryCode(QStringLiteral("de"));
-    address.setPostalCode(QString::number(postCode).rightJustified(5, '0'));
-    if (houseNumber.trimmed().isEmpty()) {
-        address.setStreet(street);
-    } else {
-        address.setStreet(street % QChar(' ') % houseNumber);
-    }
-    address.setText(address.street() % QStringLiteral(", ")
-                    % address.postalCode() % QChar(' ') % place);
-
+    QGeoAddress address = createAddress(street, houseNumber, postCode, place);
 
     setStationDetails(StationDetails {
                       .id = id,
