@@ -33,6 +33,7 @@ BasePage {
     property string fuelId
     property string name
     property alias model: listModel
+    property bool _hasAttachedPage: false
 
     allowedOrientations: Orientation.All
 
@@ -41,6 +42,8 @@ BasePage {
 
         model: StationListModel {
             id: listModel
+
+            onStatusChanged: attachMapPage()
         }
 
         Component.onCompleted: listModel.provider = provider
@@ -146,7 +149,8 @@ BasePage {
 
         ViewPlaceholder {
             enabled: listModel.status === StationListModel.Error
-            text: listModel.errorString
+            text: qsTr("Unable to fetch results")
+            hintText: listModel.errorString
         }
 
         ViewPlaceholder {
@@ -161,24 +165,32 @@ BasePage {
         PullDownMenu {
             MenuItem {
                 text: qsTr("Refresh")
-                onClicked: page._update()
+                onClicked: page.update()
             }
         }
 
         VerticalScrollDecorator { flickable: listView }
     }
 
-    function _update() {
+    function update() {
         listModel.search(coordinate, radius, fuelId)
     }
 
-    Component.onCompleted: _update()
+    Component.onCompleted: update()
 
-    onStatusChanged: {
+    onStatusChanged: attachMapPage()
+
+    function attachMapPage() {
         if (status === PageStatus.Active) {
-            pageStack.pushAttached(
-                        Qt.resolvedUrl("StationsMapPage.qml"),
-                        {position: coordinate, model: listModel, radius: radius})
+            if (listModel.status === StationListModel.Ready) {
+                pageStack.pushAttached(
+                            Qt.resolvedUrl("StationsMapPage.qml"),
+                            {position: coordinate, model: listModel, radius: radius})
+                page._hasAttachedPage = true;
+            } else if (page._hasAttachedPage) {
+                pageStack.popAttached(page)
+                page._hasAttachedPage = false;
+            }
         }
     }
 }
