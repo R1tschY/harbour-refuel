@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="de_DE" sourcelanguage="en">
+<TS version="2.1" language="de_DE" sourcelanguage="en_US">
 <context>
     <name></name>
     <message id="g95-e5">
@@ -27,31 +27,31 @@
     <name>AboutPage</name>
     <message>
         <source>About Refuel</source>
-        <translation type="unfinished">Über Refuel</translation>
+        <translation>Über Refuel</translation>
     </message>
     <message>
         <source>Search for fuel station prices</source>
-        <translation type="unfinished">Suche nach Tankstellenpreisen</translation>
+        <translation type="vanished">Suche nach Tankstellenpreisen</translation>
     </message>
     <message>
         <source>Version %1</source>
-        <translation type="unfinished">Version %1</translation>
+        <translation>Version %1</translation>
     </message>
     <message>
         <source>Copyright 2023 Richard Liebscher</source>
-        <translation type="unfinished">Copyright 2023 Richard Liebscher</translation>
+        <translation>Copyright 2023 Richard Liebscher</translation>
     </message>
     <message>
         <source>Visit on GitHub</source>
-        <translation type="unfinished">Besuche auf GitHub</translation>
+        <translation>Besuche auf GitHub</translation>
     </message>
     <message>
         <source>Licence</source>
-        <translation type="unfinished">Lizenz</translation>
+        <translation>Lizenz</translation>
     </message>
     <message>
         <source>Credits</source>
-        <translation type="unfinished">Credits</translation>
+        <translation>Credits</translation>
     </message>
     <message>
         <source>
@@ -66,30 +66,45 @@ using &lt;a href=&apos;https://photon.komoot.io/&apos;&gt;Photon&lt;/a&gt;&lt;br
 is licensed under the &lt;a href=&apos;http://scripts.sil.org/OFL&apos;&gt;SIL Open Font License 1.1&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;
 Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a&gt;&lt;br/&gt;
 </source>
-        <translation type="unfinished"></translation>
+        <translation>
+&lt;h4&gt;Kartendaten&lt;/h4&gt;
+sind lizenziert unter der &lt;a href=&apos;https://opendatacommons.org/licenses/odbl/&apos;&gt;Open Data Commons Open Database License (ODbL)&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;
+Copyright &lt;a href=&apos;https://www.openstreetmap.org/copyright&apos;&gt;OpenStreetMap&lt;/a&gt; contributors&lt;br/&gt;
+
+&lt;h4&gt;Geocoding&lt;/h4&gt;
+über &lt;a href=&apos;https://photon.komoot.io/&apos;&gt;Photon&lt;/a&gt;&lt;br/&gt;
+
+&lt;h4&gt;DSEG&lt;/h4&gt;
+ist lizenziert unter der &lt;a href=&apos;http://scripts.sil.org/OFL&apos;&gt;SIL Open Font License 1.1&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;
+Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a&gt;&lt;br/&gt;
+</translation>
+    </message>
+    <message>
+        <source>Search for fuel prices</source>
+        <translation>Suche nach Tankstellenpreisen</translation>
     </message>
 </context>
 <context>
     <name>ChooseLocationDialog</name>
     <message>
         <source>Choose position</source>
-        <translation type="unfinished"></translation>
+        <translation>Wähle Standort</translation>
     </message>
     <message>
         <source>Search address</source>
-        <translation type="unfinished"></translation>
+        <translation>Suche Adresse</translation>
     </message>
     <message>
         <source>© &lt;a href=&quot;https://www.openstreetmap.org/copyright&quot;&gt;OpenStreetMap&lt;/a&gt; contributors</source>
-        <translation type="unfinished"></translation>
+        <translation>© &lt;a href=&quot;https://www.openstreetmap.org/copyright&quot;&gt;OpenStreetMap&lt;/a&gt; contributors</translation>
     </message>
     <message>
         <source>Nothing found</source>
-        <translation type="unfinished"></translation>
+        <translation>Nichts gefunden</translation>
     </message>
     <message>
         <source>Type to start search</source>
-        <translation type="unfinished"></translation>
+        <translation>Schreibe, um Suche zu starten</translation>
     </message>
 </context>
 <context>
@@ -103,7 +118,7 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
     <name>FavsCover</name>
     <message>
         <source>Refuel</source>
-        <translation type="unfinished"></translation>
+        <translation>Refuel</translation>
     </message>
 </context>
 <context>
@@ -126,28 +141,28 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
     <message>
         <source>Unleaded E5</source>
         <extracomment>Gasoline with 95 RON and 5 percent ethanol</extracomment>
-        <translation type="unfinished">Super E5</translation>
+        <translation>Super E5</translation>
     </message>
     <message>
         <source>Unleaded E10</source>
         <extracomment>Gasoline with 95 RON and 10 percent ethanol</extracomment>
-        <translation type="unfinished">Super E10</translation>
+        <translation>Super E10</translation>
     </message>
     <message>
         <source>Unleaded Premium</source>
         <extracomment>Gasoline with 98 RON</extracomment>
-        <translation type="unfinished">Super Plus</translation>
+        <translation>Super Plus</translation>
     </message>
     <message>
         <source>Diesel</source>
-        <translation type="unfinished">Diesel</translation>
+        <translation>Diesel</translation>
     </message>
 </context>
 <context>
     <name>HomePage</name>
     <message>
         <source>Refuel</source>
-        <translation type="unfinished"></translation>
+        <translation>Refuel</translation>
     </message>
     <message>
         <source>Last Searches</source>
@@ -155,19 +170,19 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
     </message>
     <message>
         <source>Forget</source>
-        <translation type="unfinished"></translation>
+        <translation>Vergessen</translation>
     </message>
     <message>
         <source>Forgotten</source>
-        <translation type="unfinished"></translation>
+        <translation>Vergessen</translation>
     </message>
     <message>
         <source>No searches done yet</source>
-        <translation type="unfinished"></translation>
+        <translation>Bisher keine Suchen getätigt</translation>
     </message>
     <message>
         <source>Pull down to start a search</source>
-        <translation type="unfinished"></translation>
+        <translation>Schiebe herunter, um Suche zu starten</translation>
     </message>
     <message>
         <source>New search</source>
@@ -179,49 +194,60 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
     </message>
     <message>
         <source>Favorites</source>
-        <translation type="unfinished"></translation>
+        <translation>Favoriten</translation>
     </message>
 </context>
 <context>
     <name>OsmTiledMappingManagerEngine</name>
     <message>
         <source>Street Map</source>
-        <translation type="unfinished"></translation>
+        <translation>Straßenkarte</translation>
     </message>
     <message>
         <source>OpenStreetMap Standard tile layer</source>
-        <translation type="unfinished"></translation>
+        <translation>OpenStreetMap-Standard-Tile-Layer</translation>
     </message>
     <message>
         <source>OpenStreetMap German tile layer</source>
-        <translation type="unfinished"></translation>
+        <translation>Deutsche OpenStreetMap-Tile-Layer</translation>
     </message>
 </context>
 <context>
     <name>SearchPage</name>
     <message>
         <source>Search</source>
-        <translation type="unfinished"></translation>
+        <translation>Suche</translation>
     </message>
     <message>
         <source>Cancel</source>
-        <translation type="unfinished"></translation>
+        <translation>Abbrechen</translation>
     </message>
     <message>
         <source>Near</source>
-        <translation type="unfinished"></translation>
+        <translation>Position</translation>
     </message>
     <message>
         <source>Current Position</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktueller Standort</translation>
     </message>
     <message>
         <source>Fuel type</source>
-        <translation type="unfinished"></translation>
+        <translation>Kraftstofftyp</translation>
     </message>
     <message>
         <source>Search radius</source>
-        <translation type="unfinished"></translation>
+        <translation>Suchradius</translation>
+    </message>
+</context>
+<context>
+    <name>SearchResultsCover</name>
+    <message>
+        <source>Fetching...</source>
+        <translation>Laden...</translation>
+    </message>
+    <message>
+        <source>Unable to fetch</source>
+        <translation>Laden gescheitert</translation>
     </message>
 </context>
 <context>
@@ -239,96 +265,104 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
     <name>Station</name>
     <message>
         <source>Wrong update data received</source>
-        <translation type="unfinished"></translation>
+        <translation>Unpassende Aktuallisierungsdaten erhalten</translation>
     </message>
 </context>
 <context>
     <name>StationDetailsPage</name>
     <message>
         <source>Prices</source>
-        <translation type="unfinished"></translation>
+        <translation>Preise</translation>
     </message>
     <message>
         <source>Opening Hours</source>
-        <translation type="unfinished"></translation>
+        <translation>Öffnungszeiten</translation>
     </message>
     <message>
         <source>Open</source>
-        <translation type="unfinished"></translation>
+        <translation>Offen</translation>
     </message>
     <message>
         <source>Closed</source>
-        <translation type="unfinished"></translation>
+        <translation>Geschlossen</translation>
     </message>
     <message>
         <source>Daily</source>
-        <translation type="unfinished"></translation>
+        <translation>Täglich</translation>
     </message>
     <message>
         <source>Address</source>
-        <translation type="unfinished"></translation>
+        <translation>Adresse</translation>
     </message>
     <message>
         <source>No application installed to open geo location</source>
-        <translation type="unfinished"></translation>
+        <translation>Keine Anwendung installiert, um Geo-Position zu öffnen</translation>
     </message>
     <message>
         <source>Update</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuallisieren</translation>
     </message>
     <message>
         <source>Monday</source>
-        <translation type="unfinished"></translation>
+        <translation>Montag</translation>
     </message>
     <message>
         <source>Friday</source>
-        <translation type="unfinished"></translation>
+        <translation>Freitag</translation>
     </message>
     <message>
         <source>Tuesday</source>
-        <translation type="unfinished"></translation>
+        <translation>Dienstag</translation>
     </message>
     <message>
         <source>Wednesday</source>
-        <translation type="unfinished"></translation>
+        <translation>Mittwoch</translation>
     </message>
     <message>
         <source>Thursday</source>
-        <translation type="unfinished"></translation>
+        <translation>Donnerstag</translation>
     </message>
     <message>
         <source>Saturday</source>
-        <translation type="unfinished"></translation>
+        <translation>Samstag</translation>
     </message>
     <message>
         <source>Sunday</source>
-        <translation type="unfinished"></translation>
+        <translation>Sonntag</translation>
     </message>
     <message>
         <source>Public Holiday</source>
-        <translation type="unfinished"></translation>
+        <translation>Feiertag</translation>
     </message>
 </context>
 <context>
     <name>StationListPage</name>
     <message>
         <source>Stations</source>
-        <translation type="unfinished"></translation>
+        <translation>Tankstelle</translation>
     </message>
     <message>
         <source>No station found</source>
-        <translation type="unfinished"></translation>
+        <translation type="vanished">Keine Tankstelle gefunden</translation>
     </message>
     <message>
         <source>Refresh</source>
-        <translation type="unfinished"></translation>
+        <translation>Aktuallisieren</translation>
+    </message>
+    <message>
+        <source>Unable to fetch results</source>
+        <translation>Aktuallisierung nicht möglich</translation>
+    </message>
+    <message>
+        <source>No filling station found</source>
+        <translation>Keine Tankstelle gefunden</translation>
     </message>
 </context>
 <context>
     <name>TankerKoenigProvider</name>
     <message>
         <source>Licence: CC BY 4.0 - &lt;a href=&quot;https://creativecommons.tankerkoenig.de&quot;&gt;Tankerkönig&lt;/a&gt;&lt;br&gt;Data: MTS-K</source>
-        <translation type="unfinished"></translation>
+        <translation>Lizenz: CC BY 4.0 - &lt;a href=&quot;https://creativecommons.tankerkoenig.de&quot;&gt;Tankerkönig&lt;/a&gt;&lt;br&gt;Datenquelle: MTS-K</translation>
     </message>
 </context>
 </TS>

@@ -25,7 +25,7 @@ Requires: qt5-qtdeclarative-import-location
 Requires: qt5-qtdeclarative-import-positioning
 
 %description
-Search for fuel station prices in Germany
+Search for fuel prices in Germany
 
 
 %prep

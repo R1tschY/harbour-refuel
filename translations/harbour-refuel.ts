@@ -30,10 +30,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Search for fuel station prices</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Version %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -66,6 +62,10 @@ using &lt;a href=&apos;https://photon.komoot.io/&apos;&gt;Photon&lt;/a&gt;&lt;br
 is licensed under the &lt;a href=&apos;http://scripts.sil.org/OFL&apos;&gt;SIL Open Font License 1.1&lt;/a&gt;&lt;br/&gt;&lt;br/&gt;
 Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a&gt;&lt;br/&gt;
 </source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Search for fuel prices</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -203,6 +203,17 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
     </message>
 </context>
 <context>
+    <name>SearchResultsCover</name>
+    <message>
+        <source>Fetching...</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Unable to fetch</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>Station</name>
     <message>
         <source>Wrong update data received</source>
@@ -283,11 +294,15 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>No station found</source>
+        <source>Refresh</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Refresh</source>
+        <source>Unable to fetch results</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>No filling station found</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

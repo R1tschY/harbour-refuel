@@ -155,7 +155,7 @@ BasePage {
 
         ViewPlaceholder {
             enabled: listView.count === 0 && listModel.status === StationListModel.Ready
-            text: qsTr("No station found")
+            text: qsTr("No filling station found")
         }
 
         BusyLabel {

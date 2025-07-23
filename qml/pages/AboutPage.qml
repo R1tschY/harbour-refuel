@@ -56,7 +56,7 @@ Page {
             }
 
             Label {
-                text: qsTr("Search for fuel station prices")
+                text: qsTr("Search for fuel prices")
 
                 wrapMode: Text.Wrap
                 x: Theme.horizontalPageMargin
