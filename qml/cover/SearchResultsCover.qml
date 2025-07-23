@@ -38,47 +38,29 @@ CoverBackground {
                 x: Theme.paddingSmall
 
                 font.pixelSize: Theme.fontSizeSmall
-                color: Theme.highlightColor
-                placeholderColor: Theme.secondaryHighlightColor
+                color: Theme.primaryColor
+                placeholderColor: Theme.highlightColor
 
                 mainPrice: priceParts[0]
                 decimalPrice: priceParts[1]
             }
 
             Label {
-                id: distanceLabel
-
-                text: distance.toFixed(1) + " km"
-
-                anchors {
-                    top: nameLabel.bottom
-                    left: nameLabel.left
-                }
-
-                font.pixelSize: Theme.fontSizeExtraSmall * 0.7
-                color: Theme.secondaryHighlightColor
-            }
-
-            Label {
                 id: nameLabel
 
-                text: brand || name
+                text: distance.toFixed(1) + " km: " + (brand || name)
 
                 anchors {
                     left: priceLabel.right
                     leftMargin: Theme.paddingSmall
                     right: parent.right
+                    verticalCenter: priceLabel.verticalCenter
+
                 }
 
-                font.pixelSize: Theme.fontSizeExtraSmall
-                color: Theme.highlightColor
+                font.pixelSize: Theme.fontSizeSmall
+                color: Theme.primaryColor
                 truncationMode: TruncationMode.Fade
-            }
-
-            Rectangle {
-                color: "red"
-                opacity: 0.3
-                anchors.fill: parent
             }
         }
     }
@@ -108,7 +90,10 @@ CoverBackground {
     }
 
     ListView {
+        id: listView
+
         width: parent.width
+        height: Theme.itemSizeExtraSmall * 0.75 * 10
         anchors {
             top: detailsLabel.bottom
         }
@@ -116,12 +101,6 @@ CoverBackground {
         model: app.coverViewPage.model
 
         delegate: delegateComponent
-
-        Rectangle {
-            color: "red"
-            opacity: 0.3
-            anchors.fill: parent
-        }
     }
 
     CoverActionList {
