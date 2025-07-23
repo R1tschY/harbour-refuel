@@ -71,7 +71,7 @@ CoverBackground {
 
         width: parent.width
 
-        text: app.coverViewPage.name
+        text: app.coverViewPage.name ? app.coverViewPage.name : ""
         color: Theme.highlightColor
         horizontalAlignment: Text.AlignHCenter
     }
@@ -115,7 +115,7 @@ CoverBackground {
         color: Theme.highlightColor
         font.pixelSize: Theme.fontSizeLarge
         text: qsTr("Fetching...")
-        visible: app.coverViewPage.model.status === StationListModel.Loading
+        visible: !!app.coverViewPage.model && app.coverViewPage.model.status === StationListModel.Loading
     }
 
     Label {
@@ -129,7 +129,7 @@ CoverBackground {
         color: Theme.highlightColor
         font.pixelSize: Theme.fontSizeLarge
         text: qsTr("Unable to fetch")
-        visible: app.coverViewPage.model.status === StationListModel.Error
+        visible: !!app.coverViewPage.model && app.coverViewPage.model.status === StationListModel.Error
     }
 
     CoverActionList {

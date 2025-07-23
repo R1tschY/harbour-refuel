@@ -241,13 +241,6 @@ BasePage {
         station.fetchDetails()
     }
 
-    onStatusChanged: {
-        if (status === PageStatus.Active) {
-            app.coverType = "station"
-            app.coverStation = station
-        }
-    }
-
     function formatWeekDays(weekDays) {
         if (weekDays === 0xFF) {
             return qsTr("Daily")
