@@ -6,6 +6,7 @@ Release:    1
 License:    GPLv3
 URL:        https://github.com/R1tschY/harbour-refuel
 Source0:    %{name}-%{version}.tar.bz2
+Source1:    .
 Requires:   sailfishsilica-qt5 >= 0.10.9
 BuildRequires:  pkgconfig(sailfishapp) >= 1.0.2
 BuildRequires:  pkgconfig(Qt5Core)
@@ -32,7 +33,7 @@ Search for fuel station prices in Germany
 
 %build
 
-source %{_sourcedir}/../.env
+source %{SOURCE1}/../.env
 
 cmake \
   -DCPM_SOURCE_CACHE=$PWD/.cpm-cache \
