@@ -108,6 +108,7 @@ CoverBackground {
 
         CoverAction {
             iconSource: "image://theme/icon-cover-refresh"
+            onTriggered: app.coverViewPage.update();
         }
     }
 }
