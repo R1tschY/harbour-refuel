@@ -18,6 +18,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 
+import de.richardliebscher.refuel 0.1
 import "../components"
 
 CoverBackground {
@@ -83,7 +84,7 @@ CoverBackground {
             top: nameLabel.bottom
         }
 
-        text: provider.fuelName(app.coverViewPage.fuelId) + " | " + app.coverViewPage.radius + " km"
+        text: provider.fuelName(app.coverViewPage.fuelId) + " · " + app.coverViewPage.radius + " km"
         font.pixelSize: Theme.fontSizeExtraSmall
         color: Theme.highlightColor
         horizontalAlignment: Text.AlignHCenter
@@ -101,6 +102,34 @@ CoverBackground {
         model: app.coverViewPage.model
 
         delegate: delegateComponent
+    }
+
+    Label {
+        anchors {
+            top: detailsLabel.bottom
+            topMargin: Theme.paddingLarge
+            left: parent.left
+            leftMargin: Theme.paddingLarge
+        }
+
+        color: Theme.highlightColor
+        font.pixelSize: Theme.fontSizeLarge
+        text: qsTr("Fetching...")
+        visible: app.coverViewPage.model.status === StationListModel.Loading
+    }
+
+    Label {
+        anchors {
+            top: detailsLabel.bottom
+            topMargin: Theme.paddingLarge
+            left: parent.left
+            leftMargin: Theme.paddingLarge
+        }
+
+        color: Theme.highlightColor
+        font.pixelSize: Theme.fontSizeLarge
+        text: qsTr("Unable to fetch")
+        visible: app.coverViewPage.model.status === StationListModel.Error
     }
 
     CoverActionList {
