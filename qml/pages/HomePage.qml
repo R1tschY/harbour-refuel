@@ -109,7 +109,7 @@ BasePage {
 
                     Label {
                         id: detailsLabel
-                        text: provider.fuelName(fuelId) + " | " + distance + " km"
+                        text: provider.fuelName(fuelId) + " · " + distance + " km"
 
                         anchors {
                             right: parent.right
