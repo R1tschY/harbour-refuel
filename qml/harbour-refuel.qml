@@ -28,7 +28,7 @@ ApplicationWindow {
     id: app
 
     initialPage: Component { HomePage { } }
-    cover: Qt.resolvedUrl("cover/CoverPage.qml")
+    cover: Qt.resolvedUrl("cover/FavsCover.qml")
     allowedOrientations: defaultAllowedOrientations
 
     property Page coverViewPage
