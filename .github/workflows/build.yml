@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - '*'
+    tags:
+      - 'v*.*.*'
 
 env:
   SFOS_RELEASE: 4.5.0.18
