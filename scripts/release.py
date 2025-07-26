@@ -12,7 +12,7 @@ def mod_content(path: Path, fn: Callable[[str], str]):
 
 
 def exec_to_text(args: list[str]) -> str:
-    return subprocess.run(args, check=True, encoding="utf-8").stdout
+    return subprocess.run(args, check=True, encoding="utf-8", stdout=subprocess.PIPE).stdout.strip()
 
 
 def mod_rpm_version(rpm_release: str) -> Callable[[str], str]:
@@ -44,8 +44,8 @@ def main():
     subprocess.check_call([sys.executable, str(Path(__file__).parent / "changelog.py"), "release"])
     mod_content(spec_path, mod_rpm_version(rpm_release))
     subprocess.check_call(["git", "commit", "-m", f"Release {rpm_release}", str(spec_path), str(changes_path)])
-    subprocess.check_call(["git", "tag", "-a", f"Release {version_str}", f"v{version_str}"])
-    subprocess.check_call(["git", "push", exec_to_text(["git", "branch", "--show-current"]), f"v{version_str}"])
+    subprocess.check_call(["git", "tag", "-a", "-m", f"Release {version_str}", f"v{version_str}"])
+    subprocess.check_call(["git", "push", "origin", exec_to_text(["git", "branch", "--show-current"]), f"v{version_str}"])
 
     # create dev version
     subprocess.check_call([sys.executable, str(Path(__file__).parent / "changelog.py"), "prepare", f"{next_version_str}-1"])
