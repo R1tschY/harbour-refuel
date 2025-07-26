@@ -1,8 +1,8 @@
 Name:       harbour-refuel
 
 Summary:    Refuel
-Version:    0.1
-Release:    1
+Version:    0.2.0
+Release:    0
 License:    GPLv3
 URL:        https://github.com/R1tschY/harbour-refuel
 Source0:    %{name}-%{version}.tar.bz2
