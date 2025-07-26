@@ -47,6 +47,10 @@ jobs:
           echo "Version: $version"
         shell: bash
 
+      - name: Write .env file
+        shell: bash
+        run: echo "TANKERKOENIG_APIKEY={{ secrets.TANKERKOENIG_APIKEY }}" >> .env
+
       - name: Build ${{ matrix.arch }} RPM
         uses: R1tschY/sailfish-build-rpm@v1
         with:
