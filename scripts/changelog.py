@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 #
-# Copyright 2019 Richard Liebscher <richard.liebscher@gmail.com>.
+# Copyright 2025 Richard Liebscher <r1tschy@posteo.de>.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -25,13 +25,8 @@ import textwrap
 import subprocess
 
 from pathlib import Path
-from collections import namedtuple
-from typing import Match
+from typing import Callable, Match, NamedTuple
 
-
-CHANGELOG_FILE = (
-    Path(__file__).parent.parent / "rpm" / "harbour-sailfishconnect.changes"
-)
 
 HEADER_RE = re.compile(
     r"^\*\s+(?P<date>\w+\s+\w+\s+\d+\s+\d+)\s+(?P<author>[^<]+)\s+<(?P<email>[^>]+)>\s+(?P<version>[\w.~]+)-(?P<release>\d+)",
@@ -46,7 +41,7 @@ def git_user_email():
 
 
 class ChangelogHeader:
-    def __init__(self, match: Match):
+    def __init__(self, match: Match[str]):
         self.match = match
 
     @property
@@ -94,8 +89,10 @@ class ChangelogHeader:
         return (self.match.start(), self.match.end())
 
 
-class Change(namedtuple("Change", ["start", "end", "replacement"])):
-    pass
+class Change(NamedTuple):
+    start: int
+    end: int
+    replacement: str
 
 
 
@@ -107,38 +104,48 @@ def find_first_header(changelog: str) -> ChangelogHeader:
     return ChangelogHeader(match)
 
 
-def format_datetime(datetime):
+def format_datetime(datetime: datetime.datetime):
     locale.setlocale(locale.LC_ALL, "C")
     return datetime.strftime("%a %b %d %Y")
 
 
-def apply_commandfn(fn, cmd_args):
-    with CHANGELOG_FILE.open("r", encoding="utf-8") as fp:
+def get_changelog() -> Path:
+    changelogs = list((Path(__file__).parent.parent / "rpm").glob("*.changes"))
+    if len(changelogs) == 0:
+        raise RuntimeError("No changelog file found")
+    elif len(changelogs) != 1:
+        raise RuntimeError("More than one changelog file found")
+    return changelogs[0]
+
+
+def apply_commandfn(fn: Callable[[str, list[str]], Change], cmd_args: list[str]):
+    changelog_path = get_changelog()
+    with changelog_path.open("r", encoding="utf-8") as fp:
         changelog = fp.read()
 
-    change = fn(changelog=changelog, cmd_args=cmd_args)
+    change = fn(changelog, cmd_args)
 
     if change:
-        with CHANGELOG_FILE.open("w", encoding="utf-8") as fp:
+        with changelog_path.open("w", encoding="utf-8") as fp:
             fp.write(changelog[:change.start])
             fp.write(change.replacement)
             fp.write(changelog[change.end:])
 
 
-def release(changelog: str, cmd_args, date=None) -> Change:
+def release(changelog: str, cmd_args: list[str]) -> Change:
     header = find_first_header(changelog)
     return Change(
         start=header.date_loc[0],
         end=header.date_loc[1],
-        replacement=format_datetime(date or datetime.datetime.now())
+        replacement=format_datetime(datetime.datetime.now())
     )
 
-def prepare(changelog: str, cmd_args, date=None) -> Change:
+def prepare(changelog: str, cmd_args: list[str]) -> Change:
     argparser = argparse.ArgumentParser(description="Add entry")
     argparser.add_argument("version")
     args = argparser.parse_args(cmd_args)
 
-    date = format_datetime(date or datetime.datetime.now())
+    date = format_datetime(datetime.datetime.now())
     name = git_user_name()
     email = git_user_email()
 
@@ -156,7 +163,7 @@ def prepare(changelog: str, cmd_args, date=None) -> Change:
     )
 
 
-COMMANDS = {
+COMMANDS: dict[str, Callable[[str, list[str]], Change]] = {
     "release": release,
     "prepare": prepare,
 }
