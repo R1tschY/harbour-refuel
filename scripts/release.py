@@ -66,7 +66,7 @@ def main():
     subprocess.check_call(["git", "push", "origin", exec_to_text(["git", "branch", "--show-current"]), f"v{version_str}"])
 
     # create dev version
-    subprocess.check_call([sys.executable, str(Path(__file__).parent / "changelog.py"), "prepare", f"{next_version_str}-1"])
+    subprocess.check_call([sys.executable, str(Path(__file__).parent / "changelog.py"), "prepare", f"{next_version_str}"])
     mod_content(spec_path, mod_rpm_version(next_version_str))
     subprocess.check_call(["git", "commit", "-m", f"Increment version to {next_rpm_version}", str(spec_path), str(changes_path)])
     
