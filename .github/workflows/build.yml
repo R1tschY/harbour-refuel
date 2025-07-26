@@ -48,7 +48,7 @@ jobs:
       - name: Upload build result
         uses: actions/upload-artifact@v4
         with:
-          name: refuel-${{ matrix.arch }}
+          name: harbour-refuel-${{ matrix.arch }}
           path: RPMS
           compression-level: 0
   
@@ -73,13 +73,16 @@ jobs:
         shell: bash
 
       - name: Download RPMs
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: RPMS
+          pattern: harbour-refuel-*
+          merge-multiple: true
 
       - name: Find RPMs
         id: rpms
         run: |
+          ls -al RPMS
           echo "files<<EOF" >> $GITHUB_OUTPUT
           find RPMS -name '*.rpm' >> $GITHUB_OUTPUT
           echo "EOF" >> $GITHUB_OUTPUT
