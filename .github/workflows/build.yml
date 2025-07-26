@@ -57,6 +57,7 @@ jobs:
           arch: '${{ matrix.arch }}'
           release: '${{ env.SFOS_RELEASE }}'
           fix-version: false
+          enable-debug: true
 
       - name: Upload build result
         uses: actions/upload-artifact@v4
