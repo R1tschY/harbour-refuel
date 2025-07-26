@@ -59,8 +59,7 @@ Dialog {
                 property bool currentPos: false
                 readonly property bool validPosition: !isNaN(coordinate.latitude)
 
-
-                label: qsTr("Near")
+                label: qsTr("Location")
                 value: currentPos
                        ? qsTr("Current Position")
                        : address

@@ -224,7 +224,7 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
     </message>
     <message>
         <source>Near</source>
-        <translation>Position</translation>
+        <translation type="vanished">Position</translation>
     </message>
     <message>
         <source>Current Position</source>
@@ -237,6 +237,10 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
     <message>
         <source>Search radius</source>
         <translation>Suchradius</translation>
+    </message>
+    <message>
+        <source>Location</source>
+        <translation>Ort</translation>
     </message>
 </context>
 <context>

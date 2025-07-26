@@ -186,10 +186,6 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Near</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Current Position</source>
         <translation type="unfinished"></translation>
     </message>
@@ -199,6 +195,10 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
     </message>
     <message>
         <source>Search radius</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Location</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
