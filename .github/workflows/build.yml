@@ -4,8 +4,6 @@ on:
   push:
     branches:
       - '*'
-    tags:
-      - 'v*.*.*'
 
 env:
   SFOS_RELEASE: 4.5.0.18
@@ -34,19 +32,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: 'Get version'
-        id: version
-        run: |
-          REF="${{ github.ref }}"
-          if [[ "$REF" =~ ^refs/tags/v ]] ; then
-            version=${REF#refs/tags/v}
-          else
-            version=unreleased
-          fi
-          echo "version=$version" >> $GITHUB_OUTPUT
-          echo "Version: $version"
-        shell: bash
-
       - name: Write .env file
         shell: bash
         run: echo "TANKERKOENIG_APIKEY=${{ secrets.TANKERKOENIG_APIKEY }}" >> .env
@@ -65,27 +50,3 @@ jobs:
           name: refuel-${{ matrix.arch }}
           path: RPMS
           compression-level: 0
-
-      - name: Find RPMs
-        id: rpms
-        if: startsWith(github.ref, 'refs/tags/v')
-        run: |
-          echo "files<<EOF" >> $GITHUB_OUTPUT
-          find RPMS -name '*.rpm' >> $GITHUB_OUTPUT
-          echo "EOF" >> $GITHUB_OUTPUT
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/v')
-        with:
-          name: Release ${{ steps.version.outputs.version }}
-          files: 'RPMS/*.rpm'
-
-      - name: Upload to openrepos.net
-        uses: R1tschY/upload-to-openrepos@v0
-        if: startsWith(github.ref, 'refs/tags/v')
-        with:
-          login: ${{ secrets.OPENREPOS_LOGIN }}
-          password: ${{ secrets.OPENREPOS_PASSWORD }}
-          appName: 'Refuel'
-          rpms: ${{ steps.rpms.outputs.files }}
