@@ -80,5 +80,5 @@ jobs:
         with:
           login: ${{ secrets.OPENREPOS_LOGIN }}
           password: ${{ secrets.OPENREPOS_PASSWORD }}
-          appName: 'Refuel'
+          app-name: 'Refuel'
           rpms: ${{ steps.rpms.outputs.files }}
