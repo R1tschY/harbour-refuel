@@ -1,0 +1,84 @@
+name: RPM Release Build
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+env:
+  SFOS_RELEASE: 4.5.0.18
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check style
+        run: python3 scripts/bad-style.py bad-style.xml
+
+  build:
+    strategy:
+      matrix:
+        arch: ['armv7hl', 'i486', 'aarch64']
+
+    runs-on: ubuntu-latest
+    needs: [check]
+
+    env:
+      SFOS_ARCH: ${{ matrix.arch }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: 'Get version'
+        id: version
+        run: |
+          REF="${{ github.ref }}"
+          version=${REF#refs/tags/v}
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "Version: $version"
+        shell: bash
+
+      - name: Write .env file
+        shell: bash
+        run: echo "TANKERKOENIG_APIKEY=${{ secrets.TANKERKOENIG_APIKEY }}" >> .env
+
+      - name: Build ${{ matrix.arch }} RPM
+        uses: R1tschY/sailfish-build-rpm@v1
+        with:
+          arch: '${{ matrix.arch }}'
+          release: '${{ env.SFOS_RELEASE }}'
+          fix-version: false
+
+      - name: Upload build result
+        uses: actions/upload-artifact@v4
+        with:
+          name: refuel-${{ matrix.arch }}
+          path: RPMS
+          compression-level: 0
+
+      - name: Find RPMs
+        id: rpms
+        run: |
+          echo "files<<EOF" >> $GITHUB_OUTPUT
+          find RPMS -name '*.rpm' >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ steps.version.outputs.version }}
+          files: 'RPMS/*.rpm'
+
+      - name: Upload to openrepos.net
+        uses: R1tschY/upload-to-openrepos@v0
+        with:
+          login: ${{ secrets.OPENREPOS_LOGIN }}
+          password: ${{ secrets.OPENREPOS_PASSWORD }}
+          appName: 'Refuel'
+          rpms: ${{ steps.rpms.outputs.files }}
