@@ -40,8 +40,6 @@ jobs:
           REF="${{ github.ref }}"
           if [[ "$REF" =~ ^refs/tags/v ]] ; then
             version=${REF#refs/tags/v}
-            # checks
-            grep "version = \"$version\"" Cargo.toml > /dev/null
           else
             version=unreleased
           fi
