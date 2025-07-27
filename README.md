@@ -10,7 +10,7 @@ What features are provided compared to [spritradar-fork](https://openrepos.net/c
 * Improved user experience
 
 
-## What to expect?
+## Possible future features
 
 * Save favorite filling stations
 * Support for more countries
