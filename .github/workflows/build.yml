@@ -97,7 +97,7 @@ jobs:
       - name: Upload to openrepos.net
         uses: R1tschY/upload-to-openrepos@v0
         with:
-          login: ${{ secrets.OPENREPOS_LOGIN }}
+          login: ${{ vars.OPENREPOS_LOGIN }}
           password: ${{ secrets.OPENREPOS_PASSWORD }}
           app-name: 'Refuel'
           rpms: ${{ steps.rpms.outputs.files }}
