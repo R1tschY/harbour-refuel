@@ -95,7 +95,7 @@ jobs:
           files: ${{ steps.rpms.outputs.files }}
 
       - name: Upload to openrepos.net
-        uses: R1tschY/upload-to-openrepos@v0
+        uses: R1tschY/upload-to-openrepos@v1
         with:
           login: ${{ vars.OPENREPOS_LOGIN }}
           password: ${{ secrets.OPENREPOS_PASSWORD }}
