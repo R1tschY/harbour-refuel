@@ -159,6 +159,10 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
         <source>Favorites</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>OsmTiledMappingManagerEngine</name>
@@ -284,6 +288,14 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
     </message>
     <message>
         <source>Public Holiday</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Add as favourite</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Remove as favourite</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
