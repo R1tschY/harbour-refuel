@@ -71,7 +71,7 @@ CoverBackground {
 
         width: parent.width
 
-        text: app.coverViewPage.name ? app.coverViewPage.name : ""
+        text: app.coverViewPage.name || ""
         color: Theme.highlightColor
         horizontalAlignment: Text.AlignHCenter
     }
