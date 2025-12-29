@@ -88,15 +88,12 @@ Page {
                             x: Theme.paddingSmall / 2
                             y: Theme.paddingSmall / 2
 
-                            property var priceParts: formatPrice(price)
-
                             color: primaryColor
                             placeholderColor: secondaryColor
 
                             font.pixelSize: Theme.fontSizeExtraSmall
 
-                            mainPrice: priceParts[0]
-                            decimalPrice: priceParts[1]
+                            value: price
                         }
                     }
                 }

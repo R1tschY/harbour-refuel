@@ -70,8 +70,6 @@ BasePage {
 
                     contentHeight: Theme.itemSizeMedium
 
-                    property var priceParts: formatPrice(0)
-
                     property color primaryColor: fav.highlighted
                                                ? Theme.highlightColor
                                                : Theme.primaryColor
@@ -87,9 +85,6 @@ BasePage {
 
                         color: fav.primaryColor
                         placeholderColor: fav.secondaryColor
-
-                        mainPrice: priceParts[0]
-                        decimalPrice: priceParts[1]
                     }
 
                     Label {

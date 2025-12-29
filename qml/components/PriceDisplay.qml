@@ -21,8 +21,7 @@ import Sailfish.Silica 1.0
 Label {
     id: root
 
-    property alias mainPrice: root.text
-    property alias decimalPrice: decimalPriceLabel.text
+    property real value
 
     property color placeholderColor: Theme.secondaryColor
 
@@ -32,6 +31,7 @@ Label {
     font.pixelSize: Theme.fontSizeLarge
     font.family: dseg7.name
     color: Theme.highlightColor
+    text: "-.--"
 
     Label {
         id: pricePlaceholder
@@ -61,10 +61,24 @@ Label {
     Label {
         id: decimalPriceLabel
 
+        text: "-"
+
         anchors.left: pricePlaceholder.right
 
         font.pixelSize: root.font.pixelSize * 0.7
         font.family: dseg7.name
         color: root.color
+    }
+
+    onValueChanged: {
+        var v = value
+        if (!v || isNaN(v)) {
+            root.text = "-.--"
+            decimalPriceLabel.text = "-"
+        }
+
+        var str = v.toFixed(3)
+        root.text = str.slice(0, -1)
+        decimalPriceLabel.text = str.slice(-1)
     }
 }

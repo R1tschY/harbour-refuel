@@ -30,8 +30,6 @@ CoverBackground {
             height: Theme.itemSizeExtraSmall * 0.75
             width: parent.width
 
-            property var priceParts: formatPrice(price)
-
             PriceDisplay {
                 id: priceLabel
 
@@ -42,8 +40,7 @@ CoverBackground {
                 color: Theme.primaryColor
                 placeholderColor: Theme.highlightColor
 
-                mainPrice: priceParts[0]
-                decimalPrice: priceParts[1]
+                value: price
             }
 
             Label {

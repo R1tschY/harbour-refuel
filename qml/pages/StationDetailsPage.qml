@@ -70,7 +70,6 @@ BasePage {
                     id: priceItem
                     property var fuel: modelData
                     property real price: Number.NaN
-                    property var formatedPrice: formatPrice(price)
                     property bool isFav: favs.indexOf(modelData) >= 0
 
                     property color primaryColor: priceItem.highlighted
@@ -103,8 +102,7 @@ BasePage {
 
                         color: priceItem.primaryColor
                         placeholderColor: Theme.secondaryHighlightColor
-                        mainPrice: formatedPrice[0]
-                        decimalPrice: formatedPrice[1]
+                        value: price
                     }
 
                     Label {
