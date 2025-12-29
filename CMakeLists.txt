@@ -91,6 +91,8 @@ add_custom_target(distfiles
         qml/pages/ChooseLocationDialog.qml
         qml/pages/StationDetailsPage.qml
         qml/components/LastSearchesModel.qml
+        qml/components/FavsModel.qml
+        qml/components/AlertsModel.qml
         qml/components/DbConnection.qml
         qml/components/PriceDisplay.qml
         qml/components/FooterText.qml

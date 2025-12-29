@@ -22,48 +22,86 @@ QtObject {
     property string dataBaseId
 
     property var _db
+    property int _version: 0
 
     onDataBaseIdChanged: {      
         if (dataBaseId) {
-            _db = LocalStorage.openDatabaseSync(dataBaseId, "", "", 1000000)
-            if (_db.version === "") {
-                _db.changeVersion("", "1", function(tx) {
-                    tx.executeSql(
-                                "CREATE TABLE last_searches (" +
-                                "  timestamp INTEGER NOT NULL," +
-                                "  provider TEXT," +
-                                "  name TEXT NOT NULL," +
-                                "  latitude REAL," +
-                                "  longitude REAL," +
-                                "  fuel INT," +
-                                "  distance REAL," +
-                                "  UNIQUE(provider, name, latitude, longitude, fuel)" +
-                                ")");
-                })
-            } else if (_db.version === "1") {
-                _db.changeVersion("1", "2", function(tx) {
-                    tx.executeSql("DROP TABLE last_searches");
-                    tx.executeSql(
-                                "CREATE TABLE last_searches (" +
-                                "  timestamp INTEGER NOT NULL," +
-                                "  provider TEXT," +
-                                "  name TEXT NOT NULL," +
-                                "  latitude REAL," +
-                                "  longitude REAL," +
-                                "  fuel_id TEXT," +
-                                "  distance REAL," +
-                                "  UNIQUE(provider, name, latitude, longitude, fuel_id)" +
-                                ")");
-                })
-            }
+            this._db = LocalStorage.openDatabaseSync(this.dataBaseId, "", "", 1000000)
+            console.log("Got database version '" + this._db.version + "'")
+            this._version = this._db.version ? parseInt(this._db.version) : 0
+
+            this._upgrade(0, 1, function(tx) {
+                tx.executeSql(
+                            "CREATE TABLE last_searches (" +
+                            "  timestamp INTEGER NOT NULL," +
+                            "  provider TEXT," +
+                            "  name TEXT NOT NULL," +
+                            "  latitude REAL," +
+                            "  longitude REAL," +
+                            "  fuel INT," +
+                            "  distance REAL," +
+                            "  UNIQUE(provider, name, latitude, longitude, fuel)" +
+                            ")");
+            })
+
+            this._upgrade(1, 2, function(tx) {
+                tx.executeSql("DROP TABLE last_searches");
+                tx.executeSql(
+                            "CREATE TABLE last_searches (" +
+                            "  timestamp INTEGER NOT NULL," +
+                            "  provider TEXT," +
+                            "  name TEXT NOT NULL," +
+                            "  latitude REAL," +
+                            "  longitude REAL," +
+                            "  fuel_id TEXT," +
+                            "  distance REAL," +
+                            "  UNIQUE(provider, name, latitude, longitude, fuel_id)" +
+                            ")");
+            })
+
+            this._upgrade(2, 3, function(tx) {
+                tx.executeSql(
+                            "CREATE TABLE favourites (" +
+                            "  provider TEXT," +
+                            "  id TEXT NOT NULL," +
+                            "  brand TEXT," +
+                            "  name TEXT," +
+                            "  address TEXT," +
+                            "  fuel_id TEXT NOT NULL," +
+                            "  \"order\" INTEGER NOT NULL," +
+                            "  UNIQUE(provider, id, fuel_id)" +
+                            ")");
+                tx.executeSql(
+                            "CREATE TABLE alerts (" +
+                            "  favourite INTEGER NOT NULL," +
+                            "  deadline INTEGER," +
+                            "  \"limit\" REAL," +
+                            "  UNIQUE(favourite, deadline, \"limit\")" +
+                            ")");
+            })
         } else {
-            _db = null
+            this._db = null
         }
     }
 
     function transaction(fn) {
-        if (_db !== null) {
-            _db.transaction(fn)
+        if (this._db !== null) {
+            this._db.transaction(fn)
+        }
+    }
+
+    function _upgrade(from, to, fn) {
+        if (this._db !== null) {
+            if (this._version === from) {
+                console.log("Upgrading database to version '" + to + "'")
+                this._db.changeVersion(
+                            from === 0 ? "" : from.toString(),
+                            to.toString(),
+                            fn)
+                this._db = LocalStorage.openDatabaseSync(this.dataBaseId, "", "", 1000000)
+                console.log("Upgraded database to version '" + to + "'")
+                this._version = to;
+            }
         }
     }
 }
