@@ -20,12 +20,16 @@ import QtPositioning 5.2
 import Sailfish.Silica 1.0
 
 import de.richardliebscher.refuel 0.1
+import "../components"
 
 
 BasePage {
     id: page
 
     coverView: Qt.resolvedUrl("../cover/FavsCover.qml")
+
+    property bool dirtyLastSearches: false
+    property bool dirtyFavs: false
 
     SilicaFlickable {
         id: content
@@ -48,6 +52,100 @@ BasePage {
             ColumnView {
                 id: favs
                 itemHeight: Theme.itemSizeMedium
+
+                model: SqlQueryModel {
+                    id: favsQueryModel
+
+                    localStorageName: database.dataBaseId
+
+                    Component.onCompleted: {
+                        exec("SELECT rowid, id as stationId, brand, name, address, fuel_id as fuelId
+                              FROM favourites
+                              ORDER BY `order` ASC")
+                    }
+                }
+
+                delegate: ListItem {
+                    id: fav
+
+                    contentHeight: Theme.itemSizeMedium
+
+                    property var priceParts: formatPrice(0)
+
+                    property color primaryColor: fav.highlighted
+                                               ? Theme.highlightColor
+                                               : Theme.primaryColor
+                    property color secondaryColor: fav.highlighted
+                                                 ? Theme.secondaryHighlightColor
+                                                 : Theme.secondaryColor
+
+                    PriceDisplay {
+                        id: favPriceLabel
+
+                        y: Theme.paddingMedium * 1.1
+                        x: Theme.horizontalPageMargin
+
+                        color: fav.primaryColor
+                        placeholderColor: fav.secondaryColor
+
+                        mainPrice: priceParts[0]
+                        decimalPrice: priceParts[1]
+                    }
+
+                    Label {
+                        id: favDetailsLabel
+
+                        text: provider.fuelName(fuelId) + "  •  " + address
+
+                        anchors {
+                            bottom: parent.bottom
+                            bottomMargin: Theme.paddingSmall
+                            left: favPriceLabel.left
+                        }
+
+                        font.pixelSize: Theme.fontSizeSmall
+                        color: secondaryColor
+                    }
+
+                    Label {
+                        id: favNameLabel
+
+                        text: brand || name
+
+                        anchors {
+                            baseline: favPriceLabel.baseline
+                            baselineOffset: -Theme.paddingSmall
+                            left: favPriceLabel.right
+                            leftMargin: Theme.paddingMedium
+                            right: parent.right
+                            rightMargin: Theme.horizontalPageMargin
+                        }
+
+                        font.pixelSize: Theme.fontSizeLarge
+                        color: primaryColor
+                        truncationMode: TruncationMode.Fade
+                    }
+
+                    onClicked: pageStack.push(
+                                   Qt.resolvedUrl("StationDetailsPage.qml"),
+                                   { stationId: stationId })
+
+                    menu: ContextMenu {
+                         MenuItem {
+                             text: qsTr("Remove")
+                             onClicked: {
+                                 var stationId_ = stationId
+                                 var fuelId_ = stationId
+                                 fav.remorseDelete(function() {
+                                     favsModel.remove(
+                                                "tankerkoenig",
+                                                stationId_,
+                                                fuelId_)
+                                 })
+                             }
+                         }
+                     }
+                }
             }
 
             SectionHeader {
@@ -109,7 +207,7 @@ BasePage {
 
                     Label {
                         id: detailsLabel
-                        text: provider.fuelName(fuelId) + " · " + distance + " km"
+                        text: provider.fuelName(fuelId) + "  •  " + distance + " km"
 
                         anchors {
                             right: parent.right
@@ -136,12 +234,6 @@ BasePage {
                                     fuelId,
                                     distance)
                     }
-                }
-
-                Component.onCompleted: {
-                    lastSearchesModel.itemsChanged.connect(function() {
-                        lastSearchesQueryModel.reload()
-                    })
                 }
             }
         }
@@ -170,5 +262,42 @@ BasePage {
         }
 
         VerticalScrollDecorator { flickable: content }
+    }
+
+    Connections {
+        target: favsModel
+
+        onItemsChanged: {
+            if (status === PageStatus.Active) {
+                favsQueryModel.reload()
+            } else {
+                dirtyFavs = true
+            }
+        }
+    }
+
+    Connections {
+        target: lastSearchesModel
+
+        onItemsChanged: {
+            if (status === PageStatus.Active) {
+                lastSearchesQueryModel.reload()
+            } else {
+                dirtyLastSearches = true
+            }
+        }
+    }
+
+    onStatusChanged: {
+        if (status === PageStatus.Active) {
+            if (dirtyFavs) {
+                favsQueryModel.reload()
+                dirtyFavs = false;
+            }
+            if (dirtyLastSearches) {
+                lastSearchesQueryModel.reload()
+                dirtyLastSearches = false;
+            }
+        }
     }
 }

@@ -30,22 +30,36 @@ QtObject {
     function add(provider, id, brand, name, address, fuel) {
         db.transaction(function(tx) {
             tx.executeSql(
-                "INSERT INTO favourites (
-                    provider, id, brand, name, address, fuel_id,
-                    (SELECT count(*) FROM favourites))
-                 VALUES (?, ?, ?, ?, ?, ?)
-                 ON CONFLICT REPLACE",
+                "INSERT OR REPLACE INTO favourites (
+                    provider, id, brand, name, address, fuel_id, \"order\")
+                 VALUES (?, ?, ?, ?, ?, ?, (SELECT count(*) FROM favourites))",
                 [provider, id, brand, name, address, fuel])
         })
 
         itemsChanged()
     }
 
-    function removeByRowId(rowId) {
+    function getForStation(provider, id) {
+        var res = []
+        db.transaction(function(tx) {
+            var results = tx.executeSql(
+                "SELECT fuel_id \
+                 FROM favourites\
+                 WHERE provider = ? AND id = ?",
+                [provider, id])
+            var length = results.rows.length
+            for (var i = 0; i < length; i++) {
+                res.push(results.rows.item(i).fuel_id)
+            }
+        })
+        return res
+    }
+
+    function remove(provider, id, fuelId) {
         db.transaction(function(tx) {
             tx.executeSql(
-                "DELETE FROM favourites WHERE _rowid_ = ?",
-                [rowId])
+                "DELETE FROM favourites WHERE provider = ? AND id = ? AND fuel_id = ?",
+                [provider, id, fuelId])
         })
 
         itemsChanged()

@@ -78,6 +78,11 @@ ApplicationWindow {
         db: database
     }
 
+    FavsModel {
+        id: favsModel
+        db: database
+    }
+
     Connections {
         target: pageStack
 

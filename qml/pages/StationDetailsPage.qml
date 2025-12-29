@@ -27,6 +27,8 @@ BasePage {
 
     property string stationId
 
+    property var favs: favsModel.getForStation("tankerkoenig", stationId)
+
     coverView: Qt.resolvedUrl("../cover/StationCover.qml")
 
     Station {
@@ -57,60 +59,106 @@ BasePage {
                 visible: station.isOpen
             }
 
-            Column {
+            ColumnView {
                 width: page.width
-                spacing: Theme.paddingMedium
+                visible: station.isOpen
 
-                Repeater {
-                    width: page.width
-                    visible: station.isOpen
+                model: provider.fuels
+                itemHeight: Theme.itemSizeSmall
 
-                    model: provider.fuels
+                delegate: ListItem {
+                    id: priceItem
+                    property var fuel: modelData
+                    property real price: Number.NaN
+                    property var formatedPrice: formatPrice(price)
+                    property bool isFav: favs.indexOf(modelData) >= 0
 
-                    delegate: Item {
-                        id: priceItem
-                        property real price: Number.NaN
-                        property var formatedPrice: formatPrice(price)
+                    property color primaryColor: priceItem.highlighted
+                                               ? Theme.highlightColor
+                                               : Theme.primaryColor
 
-                        width: parent.width
-                        height: priceLabel.height + Theme.paddingSmall
+                    width: parent.width
 
-                        PriceDisplay {
-                            id: priceLabel
+                    Icon {
+                        id: favButton
 
-                            anchors {
-                                right: parent.horizontalCenter
-                                rightMargin: Theme.paddingSmall
-                            }
-
-                            color: Theme.highlightColor
-                            placeholderColor: Theme.secondaryHighlightColor
-                            mainPrice: formatedPrice[0]
-                            decimalPrice: formatedPrice[1]
+                        anchors {
+                            left: fuelLabel.right
+                            leftMargin: Theme.paddingSmall
+                            verticalCenter: parent.verticalCenter
                         }
 
-                        Label {
-                            id: fuelLabel
+                        source: "image://theme/icon-s-favorite"
+                        visible: isFav
+                    }
 
-                            anchors {
-                                left: parent.horizontalCenter
-                                leftMargin: Theme.paddingSmall
-                                verticalCenter: priceLabel.verticalCenter
-                            }
+                    PriceDisplay {
+                        id: priceLabel
 
-                            text: provider.fuelName(modelData)
-                            color: Theme.highlightColor
+                        anchors {
+                            right: parent.horizontalCenter
+                            rightMargin: Theme.paddingSmall
+                            verticalCenter: parent.verticalCenter
                         }
 
-                        visible: !isNaN(price)
+                        color: priceItem.primaryColor
+                        placeholderColor: Theme.secondaryHighlightColor
+                        mainPrice: formatedPrice[0]
+                        decimalPrice: formatedPrice[1]
+                    }
 
-                        Component.onCompleted: {
-                            var fuel = modelData
-                            station.updated.connect(function() {
-                                priceItem.price = station.priceFor(fuel)
-                            })
+                    Label {
+                        id: fuelLabel
+
+                        anchors {
+                            left: parent.horizontalCenter
+                            leftMargin: Theme.paddingSmall
+                            verticalCenter: priceLabel.verticalCenter
+                        }
+
+                        text: provider.fuelName(modelData)
+                        color: priceItem.primaryColor
+                    }
+
+                    visible: !isNaN(price)
+
+                    menu: ContextMenu {
+                         MenuItem {
+                             text: qsTr("Add as favourite")
+                             visible: !isFav
+                             onClicked: favsModel.add(
+                                            "tankerkoenig",
+                                            stationId,
+                                            station.brand,
+                                            station.name,
+                                            stationAddress.text,
+                                            modelData)
+                         }
+                         MenuItem {
+                             text: qsTr("Remove as favourite")
+                             visible: isFav
+                             onClicked: favsModel.remove(
+                                            "tankerkoenig",
+                                            stationId,
+                                            modelData)
+                         }
+                     }
+
+                    Connections {
+                        target: station
+
+                        onUpdated: {
+                            priceItem.price = station.priceFor(fuel);
                         }
                     }
+                }
+            }
+
+            Connections {
+                target: favsModel
+
+                onItemsChanged: {
+                    page.favs = favsModel.getForStation("tankerkoenig", stationId)
                 }
             }
 
@@ -239,6 +287,7 @@ BasePage {
     Component.onCompleted: {
         station.provider = provider
         station.fetchDetails()
+        console.log("FAVS", JSON.stringify(favs))
     }
 
     function formatWeekDays(weekDays) {
