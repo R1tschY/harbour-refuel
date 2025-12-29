@@ -23,7 +23,7 @@ jobs:
   build:
     strategy:
       matrix:
-        arch: ['armv7hl', 'i486', 'aarch64']
+        arch: ["armv7hl", "i486", "aarch64"]
 
     runs-on: ubuntu-latest
     needs: [check]
@@ -41,8 +41,8 @@ jobs:
       - name: Build ${{ matrix.arch }} RPM
         uses: R1tschY/sailfish-build-rpm@v1
         with:
-          arch: '${{ matrix.arch }}'
-          release: '${{ env.SFOS_RELEASE }}'
+          arch: "${{ matrix.arch }}"
+          release: "${{ env.SFOS_RELEASE }}"
           fix-version: false
           enable-debug: false
 
