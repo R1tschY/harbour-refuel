@@ -49,7 +49,7 @@ BasePage {
             width: page.width
 
             PageHeader {
-                title: station.brand
+                title: station.brand || station.name
             }
 
             SectionHeader {
