@@ -133,7 +133,7 @@ BasePage {
                                  var fuelId_ = stationId
                                  fav.remorseDelete(function() {
                                      favsModel.remove(
-                                                "tankerkoenig",
+                                                app.providerId,
                                                 stationId_,
                                                 fuelId_)
                                  })
@@ -223,7 +223,7 @@ BasePage {
 
                         lastSearchesModel.add(
                                     Date.now(),
-                                    "tankerkoenig",
+                                    app.providerId,
                                     name,
                                     coord,
                                     fuelId,
