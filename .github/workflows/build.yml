@@ -8,7 +8,7 @@ on:
       - 'v*.*.*'
 
 env:
-  SFOS_RELEASE: 4.5.0.18
+  SFOS_RELEASE: 5.0.0.62
 
 jobs:
   check:
@@ -32,7 +32,7 @@ jobs:
       SFOS_ARCH: ${{ matrix.arch }}
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Write .env file
         shell: bash
@@ -47,7 +47,7 @@ jobs:
           enable-debug: false
 
       - name: Upload build result
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: harbour-refuel-${{ matrix.arch }}
           path: RPMS
@@ -74,7 +74,7 @@ jobs:
         shell: bash
 
       - name: Download RPMs
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           path: RPMS
           pattern: harbour-refuel-*
