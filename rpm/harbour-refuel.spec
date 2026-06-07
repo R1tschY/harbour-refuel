@@ -1,6 +1,5 @@
 Name:       harbour-refuel
-
-Summary:    Refuel
+Summary:    Search for fuel prices
 Version:    0.2.0
 Release:    0
 License:    GPLv3
@@ -26,7 +25,7 @@ Requires: qt5-qtdeclarative-import-location
 Requires: qt5-qtdeclarative-import-positioning
 
 %description
-Search for fuel prices in Germany
+Sailfish OS application to search for fuel prices
 
 
 %prep
