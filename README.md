@@ -17,11 +17,12 @@ What features are provided compared to [spritradar-fork](https://openrepos.net/c
 * Builtin API key
 * Map View
 * Improved user experience
+* Favourites
+* Search History
 
 
 ## Possible future features
 
-* Save favorite filling stations
 * Support for more countries
 * Search for current geo position
 * Show brand icons
