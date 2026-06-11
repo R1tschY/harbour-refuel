@@ -72,7 +72,9 @@ BasePage {
                     property real price: Number.NaN
                     property bool isFav: favs.indexOf(modelData) >= 0
 
-                    property color primaryColor: priceItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+                    property color primaryColor: priceItem.highlighted
+                                               ? Theme.highlightColor
+                                               : Theme.primaryColor
 
                     width: parent.width
 
@@ -119,16 +121,25 @@ BasePage {
                     visible: !isNaN(price)
 
                     menu: ContextMenu {
-                        MenuItem {
-                            text: qsTr("Add as favourite")
-                            visible: !isFav
-                            onClicked: favsModel.add(app.providerId, stationId, station.brand, station.name, stationAddress.text, modelData)
-                        }
-                        MenuItem {
-                            text: qsTr("Remove as favourite")
-                            visible: isFav
-                            onClicked: favsModel.remove(app.providerId, stationId, modelData)
-                        }
+                         MenuItem {
+                             text: qsTr("Add as favourite")
+                             visible: !isFav
+                             onClicked: favsModel.add(
+                                            app.providerId,
+                                            stationId,
+                                            station.brand,
+                                            station.name,
+                                            stationAddress.text,
+                                            modelData)
+                         }
+                         MenuItem {
+                             text: qsTr("Remove as favourite")
+                             visible: isFav
+                             onClicked: favsModel.remove(
+                                            app.providerId,
+                                            stationId,
+                                            modelData)
+                         }
                     }
 
                     Connections {
@@ -224,7 +235,8 @@ BasePage {
 
                 Label {
                     text: stationAddress.text.replace(', ', "\n")
-                    color: addressItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+                    color: addressItem.highlighted
+                           ? Theme.highlightColor : Theme.primaryColor
 
                     anchors {
                         left: parent.left
@@ -235,10 +247,10 @@ BasePage {
                 }
 
                 onClicked: {
-                    var uri = geoUri(station.coordinate);
-                    console.log("Open geo location " + uri);
+                    var uri = geoUri(station.coordinate)
+                    console.log("Open geo location " + uri)
                     if (!Qt.openUrlExternally(uri)) {
-                        feedback.info(qsTr("No application installed to open geo location"));
+                        feedback.info(qsTr("No application installed to open geo location"))
                     }
                 }
             }
@@ -267,69 +279,51 @@ BasePage {
             }
         }
 
-        VerticalScrollDecorator {
-            flickable: content
-        }
+        VerticalScrollDecorator { flickable: content }
     }
 
     Component.onCompleted: {
-        station.provider = provider;
-        station.fetchDetails();
-        console.log("FAVS", JSON.stringify(favs));
+        station.provider = provider
+        station.fetchDetails()
+        console.log("FAVS", JSON.stringify(favs))
     }
 
     function formatWeekDays(weekDays) {
         if (weekDays === 0xFF) {
-            return qsTr("Daily");
+            return qsTr("Daily")
         }
 
-        var res = [];
+        var res = []
         if ((weekDays & 0x1f) === 0x1f) {
-            res.push(qsTr("Monday") + " - " + qsTr("Friday"));
+            res.push(qsTr("Monday") + " - " + qsTr("Friday"))
             weekDays &= ~0x1f;
         }
         for (var i = 0; i < 8; i++) {
             if ((weekDays & (1 << i)) !== 0) {
                 switch (i) {
-                case 0:
-                    res.push(qsTr("Monday"));
-                    break;
-                case 1:
-                    res.push(qsTr("Tuesday"));
-                    break;
-                case 2:
-                    res.push(qsTr("Wednesday"));
-                    break;
-                case 3:
-                    res.push(qsTr("Thursday"));
-                    break;
-                case 4:
-                    res.push(qsTr("Friday"));
-                    break;
-                case 5:
-                    res.push(qsTr("Saturday"));
-                    break;
-                case 6:
-                    res.push(qsTr("Sunday"));
-                    break;
-                case 7:
-                    res.push(qsTr("Public Holiday"));
-                    break;
+                case 0: res.push(qsTr("Monday")); break;
+                case 1: res.push(qsTr("Tuesday")); break;
+                case 2: res.push(qsTr("Wednesday")); break;
+                case 3: res.push(qsTr("Thursday")); break;
+                case 4: res.push(qsTr("Friday")); break;
+                case 5: res.push(qsTr("Saturday")); break;
+                case 6: res.push(qsTr("Sunday")); break;
+                case 7: res.push(qsTr("Public Holiday")); break;
                 }
             }
         }
-        return res.join(", ");
+        return res.join(", ")
     }
 
     function formatTime(time) {
-        var hours = String(time.getHours());
+        var hours = String(time.getHours())
         if (hours.length == 1) {
-            hours = "0" + hours;
+            hours = "0" + hours
         }
-        var min = String(time.getMinutes());
+        var min = String(time.getMinutes())
         if (min.length == 1) {
-            min = "0" + min;
+            min = "0" + min
         }
-        return hours + ":" + min;
+        return hours + ":" + min
     }
 }
