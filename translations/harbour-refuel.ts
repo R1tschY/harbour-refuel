@@ -165,6 +165,17 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
     </message>
 </context>
 <context>
+    <name>MisePriceProvider</name>
+    <message>
+        <source>Metano (CNG)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GPL (LPG)</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>OsmTiledMappingManagerEngine</name>
     <message>
         <source>Street Map</source>
@@ -203,6 +214,18 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
     </message>
     <message>
         <source>Location</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Provider</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Germany (Tankerkönig)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Italy (MISE)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

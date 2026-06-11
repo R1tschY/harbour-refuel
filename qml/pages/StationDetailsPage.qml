@@ -27,7 +27,7 @@ BasePage {
 
     property string stationId
 
-    property var favs: favsModel.getForStation("tankerkoenig", stationId)
+    property var favs: favsModel.getForStation(app.providerId, stationId)
 
     coverView: Qt.resolvedUrl("../cover/StationCover.qml")
 
@@ -125,7 +125,7 @@ BasePage {
                              text: qsTr("Add as favourite")
                              visible: !isFav
                              onClicked: favsModel.add(
-                                            "tankerkoenig",
+                                            app.providerId,
                                             stationId,
                                             station.brand,
                                             station.name,
@@ -136,11 +136,11 @@ BasePage {
                              text: qsTr("Remove as favourite")
                              visible: isFav
                              onClicked: favsModel.remove(
-                                            "tankerkoenig",
+                                            app.providerId,
                                             stationId,
                                             modelData)
                          }
-                     }
+                    }
 
                     Connections {
                         target: station
@@ -156,7 +156,7 @@ BasePage {
                 target: favsModel
 
                 onItemsChanged: {
-                    page.favs = favsModel.getForStation("tankerkoenig", stationId)
+                    page.favs = favsModel.getForStation(app.providerId, stationId);
                 }
             }
 
@@ -215,7 +215,7 @@ BasePage {
 
                 delegate: Label {
                     text: modelData
-                     color: Theme.highlightColor
+                    color: Theme.highlightColor
 
                     anchors {
                         left: parent.left
