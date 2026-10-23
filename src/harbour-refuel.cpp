@@ -30,6 +30,7 @@
 #include "models/sqlquerymodel.h"
 #include "config.h"
 #include "station.h"
+#include "misepriceprovider.h"
 
 Q_IMPORT_PLUGIN(OsmImprovedPlugin)
 
@@ -39,6 +40,8 @@ int main(int argc, char *argv[])
                 "de.richardliebscher.refuel", 0, 1, "StationListModel");
     qmlRegisterType<TankerKoenigProvider>(
                 "de.richardliebscher.refuel", 0, 1, "TankerKoenigProvider");
+    qmlRegisterType<MisePriceProvider>(
+                "de.richardliebscher.refuel", 0, 1, "MisePriceProvider");
     qmlRegisterType<Station>(
                 "de.richardliebscher.refuel", 0, 1, "Station");
     qmlRegisterType<SqlQueryModel>(

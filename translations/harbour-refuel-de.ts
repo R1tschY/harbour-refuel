@@ -157,6 +157,14 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
         <source>Diesel</source>
         <translation>Diesel</translation>
     </message>
+    <message>
+        <source>Metano (CNG)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GPL (LPG)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>HomePage</name>
@@ -199,6 +207,49 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
     <message>
         <source>Remove</source>
         <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>MisePriceProvider</name>
+    <message>
+        <source>Monday</source>
+        <translation>Montag</translation>
+    </message>
+    <message>
+        <source>Tuesday</source>
+        <translation>Dienstag</translation>
+    </message>
+    <message>
+        <source>Wednesday</source>
+        <translation>Mittwoch</translation>
+    </message>
+    <message>
+        <source>Thursday</source>
+        <translation>Donnerstag</translation>
+    </message>
+    <message>
+        <source>Friday</source>
+        <translation>Freitag</translation>
+    </message>
+    <message>
+        <source>Saturday</source>
+        <translation>Samstag</translation>
+    </message>
+    <message>
+        <source>Sunday</source>
+        <translation>Sonntag</translation>
+    </message>
+    <message>
+        <source>Public holiday</source>
+        <translation>Feiertag</translation>
+    </message>
+    <message>
+        <source>%1 morning</source>
+        <translation>%1 morgens</translation>
+    </message>
+    <message>
+        <source>%1 afternoon</source>
+        <translation>%1 nachmittags</translation>
     </message>
 </context>
 <context>
@@ -245,6 +296,18 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
     <message>
         <source>Location</source>
         <translation>Ort</translation>
+    </message>
+    <message>
+        <source>Provider</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Germany (Tankerkönig)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Italy (MISE)</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

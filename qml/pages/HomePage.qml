@@ -59,7 +59,7 @@ BasePage {
                     localStorageName: database.dataBaseId
 
                     Component.onCompleted: {
-                        exec("SELECT rowid, id as stationId, brand, name, address, fuel_id as fuelId
+                        exec("SELECT rowid, id as stationId, brand, name, address, fuel_id as fuelId, provider
                               FROM favourites
                               ORDER BY `order` ASC")
                     }
@@ -121,19 +121,23 @@ BasePage {
                         truncationMode: TruncationMode.Fade
                     }
 
-                    onClicked: pageStack.push(
+                    onClicked: {
+                        app.setProviderId(provider)
+                        pageStack.push(
                                    Qt.resolvedUrl("StationDetailsPage.qml"),
                                    { stationId: stationId })
+                    }
 
                     menu: ContextMenu {
                          MenuItem {
                              text: qsTr("Remove")
                              onClicked: {
                                  var stationId_ = stationId
-                                 var fuelId_ = stationId
+                                 var fuelId_ = fuelId
+                                 var provider_ = provider
                                  fav.remorseDelete(function() {
                                      favsModel.remove(
-                                                "tankerkoenig",
+                                                provider_,
                                                 stationId_,
                                                 fuelId_)
                                  })
@@ -158,7 +162,7 @@ BasePage {
                     localStorageName: database.dataBaseId
 
                     Component.onCompleted: {
-                        exec("SELECT rowid, name, fuel_id as fuelId, latitude, longitude, distance
+                        exec("SELECT rowid, name, fuel_id as fuelId, latitude, longitude, distance, provider
                               FROM last_searches
                               ORDER BY timestamp DESC")
                     }
@@ -217,13 +221,15 @@ BasePage {
                     onClicked: {
                         var coord = QtPositioning.coordinate(latitude, longitude)
 
+                        app.setProviderId(provider)
+
                         pageStack.push(
                                     Qt.resolvedUrl("StationListPage.qml"),
                                     { fuelId: fuelId, radius: distance, coordinate: coord, name: name })
 
                         lastSearchesModel.add(
                                     Date.now(),
-                                    "tankerkoenig",
+                                    provider,
                                     name,
                                     coord,
                                     fuelId,

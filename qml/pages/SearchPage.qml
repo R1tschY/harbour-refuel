@@ -49,6 +49,28 @@ Dialog {
                 cancelText: qsTr("Cancel")
             }
 
+            ComboBox {
+                id: providerChooser
+
+                width: parent.width
+
+                label: qsTr("Provider")
+                currentIndex: app.providerId === "mise" ? 1 : 0
+
+                menu: ContextMenu {
+                    MenuItem {
+                        text: qsTr("Germany (Tankerkönig)")
+                    }
+                    MenuItem {
+                        text: qsTr("Italy (MISE)")
+                    }
+                }
+
+                onCurrentIndexChanged: {
+                    app.setProviderId(currentIndex === 1 ? "mise" : "tankerkoenig")
+                }
+            }
+
             ValueButton {
                 id: locationChooser
 
@@ -147,7 +169,7 @@ Dialog {
 
         lastSearchesModel.add(
                     Date.now(),
-                    "tankerkoenig",
+                    app.providerId,
                     name,
                     currentPos ? QtPositioning.coordinate() : coordinate,
                     fuel,

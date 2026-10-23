@@ -45,6 +45,8 @@ public:
     static const QString GASOLINE_95_E10;
     static const QString GASOLINE_98;
     static const QString DIESEL;
+    static const QString CNG;
+    static const QString LPG;
 
     enum class Sorting {
         Price,

@@ -19,6 +19,7 @@ import QtQuick 2.0
 import QtLocation 5.3
 import Sailfish.Silica 1.0
 import Nemo.Notifications 1.0
+import Nemo.Configuration 1.0
 import "pages"
 import "components"
 
@@ -32,6 +33,19 @@ ApplicationWindow {
     allowedOrientations: defaultAllowedOrientations
 
     property Page coverViewPage
+
+    ConfigurationGroup {
+        id: settings
+        path: "/apps/harbour-refuel"
+        property string providerId: "tankerkoenig"
+    }
+
+    property string providerId: settings.providerId
+    property QtObject provider: providerId === "mise" ? miseProvider : tankerkoenigProvider
+
+    function setProviderId(id) {
+        settings.providerId = id
+    }
 
     Notification {
         id: feedback
@@ -62,7 +76,13 @@ ApplicationWindow {
     }
 
     TankerKoenigProvider {
-        id: provider
+        id: tankerkoenigProvider
+
+        userAgent: "Refuel Sailfish OS/0.1 Qt/5.6.3" // TODO: replace versions
+    }
+
+    MisePriceProvider {
+        id: miseProvider
 
         userAgent: "Refuel Sailfish OS/0.1 Qt/5.6.3" // TODO: replace versions
     }
