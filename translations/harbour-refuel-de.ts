@@ -157,6 +157,14 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
         <source>Diesel</source>
         <translation>Diesel</translation>
     </message>
+    <message>
+        <source>Metano (CNG)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>GPL (LPG)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>HomePage</name>
@@ -204,12 +212,44 @@ Copyright 2020 &lt;a href=&apos;https://www.keshikan.net&apos;&gt;keshikan&lt;/a
 <context>
     <name>MisePriceProvider</name>
     <message>
-        <source>Metano (CNG)</source>
-        <translation type="unfinished"></translation>
+        <source>Monday</source>
+        <translation>Montag</translation>
     </message>
     <message>
-        <source>GPL (LPG)</source>
-        <translation type="unfinished"></translation>
+        <source>Tuesday</source>
+        <translation>Dienstag</translation>
+    </message>
+    <message>
+        <source>Wednesday</source>
+        <translation>Mittwoch</translation>
+    </message>
+    <message>
+        <source>Thursday</source>
+        <translation>Donnerstag</translation>
+    </message>
+    <message>
+        <source>Friday</source>
+        <translation>Freitag</translation>
+    </message>
+    <message>
+        <source>Saturday</source>
+        <translation>Samstag</translation>
+    </message>
+    <message>
+        <source>Sunday</source>
+        <translation>Sonntag</translation>
+    </message>
+    <message>
+        <source>Public holiday</source>
+        <translation>Feiertag</translation>
+    </message>
+    <message>
+        <source>%1 morning</source>
+        <translation>%1 morgens</translation>
+    </message>
+    <message>
+        <source>%1 afternoon</source>
+        <translation>%1 nachmittags</translation>
     </message>
 </context>
 <context>

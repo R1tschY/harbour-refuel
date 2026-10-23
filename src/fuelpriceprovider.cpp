@@ -23,6 +23,8 @@ const QString FuelPriceProvider::GASOLINE_95_E5 = QString::fromLatin1("g95-e5");
 const QString FuelPriceProvider::GASOLINE_95_E10 = QString::fromLatin1("g95");
 const QString FuelPriceProvider::GASOLINE_98 = QString::fromLatin1("g98");
 const QString FuelPriceProvider::DIESEL = QString::fromLatin1("d");
+const QString FuelPriceProvider::CNG = QString::fromLatin1("cng");
+const QString FuelPriceProvider::LPG = QString::fromLatin1("lpg");
 
 FuelPriceProvider::FuelPriceProvider(QObject *parent)
     : QObject(parent)
@@ -41,6 +43,10 @@ QString FuelPriceProvider::fuelName(const QString &fuelId)
         return tr("Unleaded Premium");
     } else if (fuelId == DIESEL) {
         return tr("Diesel");
+    } else if (fuelId == CNG) {
+        return tr("Metano (CNG)");
+    } else if (fuelId == LPG) {
+        return tr("GPL (LPG)");
     } else {
         return QStringLiteral("Unknown: ") + fuelId;
     }

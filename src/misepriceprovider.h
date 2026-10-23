@@ -18,7 +18,9 @@
 #ifndef MISEPRICEPROVIDER_H
 #define MISEPRICEPROVIDER_H
 
+#include <QGeoCoordinate>
 #include <QGeoRectangle>
+#include <QHash>
 #include <QNetworkAccessManager>
 #include <QObject>
 #include <QVector>
@@ -48,14 +50,13 @@ public:
 
     StationUpdatesReply *pricesForStations(const QStringList &ids) override;
 
-    Q_INVOKABLE QString fuelName(const QString &fuelId) override;
-
 signals:
     void userAgentChanged();
 
 private:
     QNetworkAccessManager m_network;
     QString m_userAgent;
+    QHash<QString, QGeoCoordinate> m_stationCoords;
 };
 
 class MisePriceReply : public FuelPriceReply
@@ -66,11 +67,14 @@ public:
                             double radius,
                             const QString &fuelId,
                             FuelPriceProvider::Sorting sorting,
-                            QNetworkReply *reply);
+                            QNetworkReply *reply,
+                            QHash<QString, QGeoCoordinate> *stationCoords);
 
 private:
     void onNetworkReplyFinished();
     void onNetworkReplyError();
+
+    QHash<QString, QGeoCoordinate> *m_stationCoords;
 };
 
 class MiseStationDetailsReply : public StationDetailsReply

@@ -42,51 +42,30 @@ static QString detailsUrl(int id)
            % QString::number(id);
 }
 
-static const int CARB_BENZINA = 1;
-static const int CARB_GASOLIO = 2;
-static const int CARB_METANO = 3;
-static const int CARB_GPL = 4;
+// Fuel identifiers used by the MISE Osservaprezzi Carburanti API.
+enum class MiseFuelId {
+    Gasoline = 1,
+    Diesel = 2,
+    Cng = 3,
+    Lpg = 4,
+};
 
-static const QString MISE_METANO = QStringLiteral("cng");
-static const QString MISE_GPL = QStringLiteral("lpg");
-
-static int fuelIdToCarb(const QString &fuelId)
+static MiseFuelId fuelIdToMiseFuelId(const QString &fuelId)
 {
     if (fuelId == FuelPriceProvider::DIESEL) {
-        return CARB_GASOLIO;
-    } else if (fuelId == MISE_METANO) {
-        return CARB_METANO;
-    } else if (fuelId == MISE_GPL) {
-        return CARB_GPL;
+        return MiseFuelId::Diesel;
+    } else if (fuelId == FuelPriceProvider::CNG) {
+        return MiseFuelId::Cng;
+    } else if (fuelId == FuelPriceProvider::LPG) {
+        return MiseFuelId::Lpg;
     }
-    return CARB_BENZINA;
+    return MiseFuelId::Gasoline;
 }
 
 static QString fuelIdToFuelType(const QString &fuelId)
 {
-    return QString::number(fuelIdToCarb(fuelId)) % QStringLiteral("-x");
-}
-
-static QString encodeStationId(int id, double lat, double lng)
-{
-    return QString::number(id) % QStringLiteral("|") % QString::number(lat, 'f', 6)
-           % QStringLiteral("|") % QString::number(lng, 'f', 6);
-}
-
-static bool decodeStationId(const QString &encoded, int &id, double &lat, double &lng)
-{
-    auto parts = encoded.split(QLatin1Char('|'));
-    if (parts.size() != 3)
-        return false;
-    bool ok;
-    id = parts[0].toInt(&ok);
-    if (!ok)
-        return false;
-    lat = parts[1].toDouble(&ok);
-    if (!ok)
-        return false;
-    lng = parts[2].toDouble(&ok);
-    return ok;
+    return QString::number(static_cast<int>(fuelIdToMiseFuelId(fuelId)))
+           % QStringLiteral("-x");
 }
 
 static QNetworkReply *postZoneSearch(QNetworkAccessManager &network,
@@ -147,7 +126,7 @@ static QGeoAddress parseDetailsAddress(const QString &addr)
     address.setCountryCode(QStringLiteral("it"));
     address.setText(addr);
 
-    static QRegularExpression re(
+    static const QRegularExpression re(
         QStringLiteral(R"(^(.*)\s+(\d{5})\s*[-–]\s*(.*?)\s*\(([A-Z]{1,2})\)$)"));
     auto match = re.match(addr.trimmed());
     if (match.hasMatch()) {
@@ -159,9 +138,9 @@ static QGeoAddress parseDetailsAddress(const QString &addr)
     return address;
 }
 
-static OpeningTime::WeekDays giornoToWeekDay(int giorno)
+static OpeningTime::WeekDays weekDayFromId(int weekDayId)
 {
-    switch (giorno) {
+    switch (weekDayId) {
     case 1:
         return OpeningTime::Monday;
     case 2:
@@ -183,55 +162,55 @@ static OpeningTime::WeekDays giornoToWeekDay(int giorno)
     }
 }
 
-static QString giornoName(int giorno)
+static QString weekDayName(int weekDayId)
 {
-    switch (giorno) {
+    switch (weekDayId) {
     case 1:
-        return QStringLiteral("Lunedì");
+        return MisePriceProvider::tr("Monday");
     case 2:
-        return QStringLiteral("Martedì");
+        return MisePriceProvider::tr("Tuesday");
     case 3:
-        return QStringLiteral("Mercoledì");
+        return MisePriceProvider::tr("Wednesday");
     case 4:
-        return QStringLiteral("Giovedì");
+        return MisePriceProvider::tr("Thursday");
     case 5:
-        return QStringLiteral("Venerdì");
+        return MisePriceProvider::tr("Friday");
     case 6:
-        return QStringLiteral("Sabato");
+        return MisePriceProvider::tr("Saturday");
     case 7:
-        return QStringLiteral("Domenica");
+        return MisePriceProvider::tr("Sunday");
     case 8:
-        return QStringLiteral("Festivo");
+        return MisePriceProvider::tr("Public holiday");
     default:
         return QString();
     }
 }
 
-static QVector<OpeningTime> parseOpeningTimes(const QJsonArray &orari)
+static QVector<OpeningTime> parseOpeningTimes(const QJsonArray &openingTimes)
 {
     QVector<OpeningTime> result;
 
-    for (auto entry : orari) {
+    for (auto entry : openingTimes) {
         auto obj = entry.toObject();
-        int giorno = obj.value(QStringLiteral("giornoSettimanaId")).toInt();
-        auto weekDay = giornoToWeekDay(giorno);
+        int weekDayId = obj.value(QStringLiteral("giornoSettimanaId")).toInt();
+        auto weekDay = weekDayFromId(weekDayId);
         if (weekDay == OpeningTime::NoDays)
             continue;
 
         bool h24 = obj.value(QStringLiteral("flagH24")).toBool();
-        bool chiusura = obj.value(QStringLiteral("flagChiusura")).toBool();
-        bool nonComunicato = obj.value(QStringLiteral("flagNonComunicato")).toBool();
-        bool continuato = obj.value(QStringLiteral("flagOrarioContinuato")).toBool();
+        bool closed = obj.value(QStringLiteral("flagChiusura")).toBool();
+        bool notReported = obj.value(QStringLiteral("flagNonComunicato")).toBool();
+        bool continuous = obj.value(QStringLiteral("flagOrarioContinuato")).toBool();
 
-        if (chiusura || nonComunicato)
+        if (closed || notReported)
             continue;
 
         if (h24) {
-            result.push_back(OpeningTime(weekDay, giornoName(giorno), QTime(0, 0), QTime(23, 59)));
+            result.push_back(OpeningTime(weekDay, weekDayName(weekDayId), QTime(0, 0), QTime(23, 59)));
             continue;
         }
 
-        if (continuato) {
+        if (continuous) {
             auto startStr = obj.value(QStringLiteral("oraAperturaOrarioContinuato")).toString();
             auto endStr = obj.value(QStringLiteral("oraChiusuraOrarioContinuato")).toString();
             QTime start = QTime::fromString(startStr, QStringLiteral("hh:mm"));
@@ -239,7 +218,7 @@ static QVector<OpeningTime> parseOpeningTimes(const QJsonArray &orari)
             if (start.isValid() && end.isValid()) {
                 if (end == QTime(0, 0))
                     end = QTime(23, 59);
-                result.push_back(OpeningTime(weekDay, giornoName(giorno), start, end));
+                result.push_back(OpeningTime(weekDay, weekDayName(weekDayId), start, end));
             }
         } else {
             auto amStartStr = obj.value(QStringLiteral("oraAperturaMattina")).toString();
@@ -256,7 +235,8 @@ static QVector<OpeningTime> parseOpeningTimes(const QJsonArray &orari)
                 if (amEnd == QTime(0, 0))
                     amEnd = QTime(23, 59);
                 result.push_back(OpeningTime(weekDay,
-                                             giornoName(giorno) % QStringLiteral(" mattina"),
+                                             MisePriceProvider::tr("%1 morning")
+                                                     .arg(weekDayName(weekDayId)),
                                              amStart,
                                              amEnd));
             }
@@ -264,7 +244,8 @@ static QVector<OpeningTime> parseOpeningTimes(const QJsonArray &orari)
                 if (pmEnd == QTime(0, 0))
                     pmEnd = QTime(23, 59);
                 result.push_back(OpeningTime(weekDay,
-                                             giornoName(giorno) % QStringLiteral(" pomeriggio"),
+                                             MisePriceProvider::tr("%1 afternoon")
+                                                     .arg(weekDayName(weekDayId)),
                                              pmStart,
                                              pmEnd));
             }
@@ -285,14 +266,14 @@ static QHash<QString, float> parseFuelPrices(const QJsonArray &fuels)
             continue;
 
         QString fuelKey;
-        if (fuelId == CARB_BENZINA) {
+        if (fuelId == static_cast<int>(MiseFuelId::Gasoline)) {
             fuelKey = FuelPriceProvider::GASOLINE_95_E5;
-        } else if (fuelId == CARB_GASOLIO) {
+        } else if (fuelId == static_cast<int>(MiseFuelId::Diesel)) {
             fuelKey = FuelPriceProvider::DIESEL;
-        } else if (fuelId == CARB_METANO) {
-            fuelKey = MISE_METANO;
-        } else if (fuelId == CARB_GPL) {
-            fuelKey = MISE_GPL;
+        } else if (fuelId == static_cast<int>(MiseFuelId::Cng)) {
+            fuelKey = FuelPriceProvider::CNG;
+        } else if (fuelId == static_cast<int>(MiseFuelId::Lpg)) {
+            fuelKey = FuelPriceProvider::LPG;
         } else {
             continue;
         }
@@ -328,17 +309,7 @@ QString MisePriceProvider::copyright() const
 
 QStringList MisePriceProvider::fuels() const
 {
-    return {GASOLINE_95_E5, DIESEL, MISE_METANO, MISE_GPL};
-}
-
-QString MisePriceProvider::fuelName(const QString &fuelId)
-{
-    if (fuelId == MISE_METANO) {
-        return tr("Metano (CNG)");
-    } else if (fuelId == MISE_GPL) {
-        return tr("GPL (LPG)");
-    }
-    return FuelPriceProvider::fuelName(fuelId);
+    return {GASOLINE_95_E5, DIESEL, CNG, LPG};
 }
 
 void MisePriceProvider::setUserAgent(const QString &value)
@@ -361,15 +332,17 @@ FuelPriceReply *MisePriceProvider::list(const QGeoCoordinate &coordinate,
     qCInfo(logger) << "Start list request radius=" << radius;
     auto *reply = postZoneSearch(m_network, coordinate, radius, fuelType, priceOrder, m_userAgent);
 
-    return new MisePriceReply(coordinate, radius, fuelId, sorting, reply);
+    return new MisePriceReply(coordinate, radius, fuelId, sorting, reply, &m_stationCoords);
 }
 
 MisePriceReply::MisePriceReply(const QGeoCoordinate &coordinate,
                                double radius,
                                const QString &fuelId,
                                FuelPriceProvider::Sorting sorting,
-                               QNetworkReply *reply)
+                               QNetworkReply *reply,
+                               QHash<QString, QGeoCoordinate> *stationCoords)
     : FuelPriceReply(coordinate, radius, fuelId, sorting)
+    , m_stationCoords(stationCoords)
 {
     reply->setReadBufferSize(0);
 
@@ -408,7 +381,7 @@ void MisePriceReply::onNetworkReplyFinished()
     const auto results = root.value(QStringLiteral("results")).toArray();
     qCInfo(logger) << "Got list result with" << results.size() << "items";
 
-    int requestedCarb = fuelIdToCarb(fuelId());
+    const int requestedFuel = static_cast<int>(fuelIdToMiseFuelId(fuelId()));
 
     for (auto station : results) {
         auto obj = station.toObject();
@@ -428,7 +401,7 @@ void MisePriceReply::onNetworkReplyFinished()
         for (auto f : fuels) {
             auto fuelObj = f.toObject();
             int fuelId = fuelObj.value(QStringLiteral("fuelId")).toInt(-1);
-            if (fuelId == requestedCarb) {
+            if (fuelId == requestedFuel) {
                 float price = static_cast<float>(fuelObj.value(QStringLiteral("price")).toDouble());
                 if (price > 0 && (bestPrice < 0 || price < bestPrice)) {
                     bestPrice = price;
@@ -439,7 +412,10 @@ void MisePriceReply::onNetworkReplyFinished()
         if (bestPrice < 0)
             continue;
 
-        addStation(StationWithPrice{.id = encodeStationId(id, lat, lng),
+        const auto idStr = QString::number(id);
+        m_stationCoords->insert(idStr, QGeoCoordinate(lat, lng));
+
+        addStation(StationWithPrice{.id = idStr,
                                     .name = !name.isEmpty() ? name : brand,
                                     .brand = brand,
                                     .address = QGeoAddress(),
@@ -472,19 +448,21 @@ void MisePriceReply::onNetworkReplyError()
 
 StationDetailsReply *MisePriceProvider::stationForId(const QString &id)
 {
-    int intId;
-    double lat, lng;
-    if (!decodeStationId(id, intId, lat, lng)) {
+    bool ok;
+    int intId = id.toInt(&ok);
+    if (!ok) {
         qCWarning(logger) << "Invalid station ID format:" << id;
         auto *reply = new MiseStationDetailsReply(id, QGeoCoordinate());
         QMetaObject::invokeMethod(reply, "reportError", Qt::QueuedConnection);
         return reply;
     }
 
+    auto coord = m_stationCoords.value(id);
+
     qCInfo(logger) << "Start details request for" << id;
     auto *netReply = getStationDetails(m_network, intId, m_userAgent);
 
-    return new MiseStationDetailsReply(id, QGeoCoordinate(lat, lng), netReply);
+    return new MiseStationDetailsReply(id, coord, netReply);
 }
 
 MiseStationDetailsReply::MiseStationDetailsReply(const QString &stationId,
@@ -594,9 +572,9 @@ MiseStationUpdatesReply::MiseStationUpdatesReply(const QStringList &stationIds,
     m_pendingReplies.reserve(stationIds.size());
 
     for (const auto &id : stationIds) {
-        int intId;
-        double lat, lng;
-        if (!decodeStationId(id, intId, lat, lng)) {
+        bool ok;
+        int intId = id.toInt(&ok);
+        if (!ok) {
             qCWarning(logger) << "Invalid station ID format for update:" << id;
             continue;
         }
