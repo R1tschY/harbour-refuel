@@ -21,6 +21,14 @@ What features are provided compared to [spritradar-fork](https://openrepos.net/c
 * Search History
 
 
+## Install
+
+* OpenRepos: https://openrepos.net/content/r1tschy/refuel
+* Harpoon:
+
+  [![Add to Harpoon](add-to-harpoon.png)](https://github.com/JuhaniLehtimaeki/Harpoon)
+
+
 ## Possible future features
 
 * Support for more countries
